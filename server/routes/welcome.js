@@ -3,10 +3,10 @@
 export default (app) => {
   app
     // .get('/', { name: 'root' }, (req, reply) => {
-    //   reply.render('welcome/index');
+    //   reply.render('layouts/application2');
     // })
     .get('/', { name: 'root' }, (req, reply) => {
-      reply.render('welcome/index2');
+      reply.render('welcome/index');
     })
     .get('/protected', { name: 'protected', preValidation: app.authenticate }, (req, reply) => {
       reply.render('welcome/index');
