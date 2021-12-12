@@ -12,6 +12,12 @@ export default (app) => {
     .get('/users/new', { name: 'newUser' }, (req, reply) => {
       const user = new app.objection.models.user();
       reply.render('users/new', { user });
+      return reply;
+    })
+    .get('/users/:id/edit', { name: 'editUser' }, async (req, reply) => {
+      const { id } = req.params;
+      const user = await app.objection.models.user.query().findById(id);
+      reply.render('users/edit', { user });
     })
     .post('/users', async (req, reply) => {
       try {
@@ -25,5 +31,8 @@ export default (app) => {
         reply.render('users/new', { user: req.body.data, errors: data });
         return reply;
       }
+    })
+    .patch('/users/:id', { name: 'updateUser' }, async (req, reply) => {
+      reply.send('Hello world');
     });
 };

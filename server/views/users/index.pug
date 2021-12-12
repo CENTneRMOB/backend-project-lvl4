@@ -1,4 +1,4 @@
-extends ../layouts/application.pug
+extends ../layouts/application2.pug
 
 block content
   table.table.table-striped
@@ -7,9 +7,13 @@ block content
         th= t('views.users.id')
         th= t('views.users.email')
         th= t('views.users.createdAt')
+        th
     tbody
       each user in users
         tr
           td= user.id
           td= user.email
           td= formatDate(user.createdAt)
+          if isAuthenticated()
+            td
+              +buttonTo(route('users'))(class="btn nav-link" value=t('views.users.exist.edit'))
