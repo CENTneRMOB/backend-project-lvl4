@@ -11,13 +11,22 @@ export default (app) => {
     })
     .get('/users/new', { name: 'newUser' }, (req, reply) => {
       const user = new app.objection.models.user();
+      console.log('NEWUSER: ', user);
       reply.render('users/new', { user });
       return reply;
     })
-    .get('/users/:id/edit', { name: 'editUser' }, async (req, reply) => {
+    .get('/users/:id/edit', async (req, reply) => {
       const { id } = req.params;
-      const user = await app.objection.models.user.query().findById(id);
-      reply.render('users/edit', { user });
+      try {
+        const user = await app.objection.models.user.query().findById(id);
+        console.log('USER EDIT: ', user);
+        console.log(typeof id);
+        reply.render('users/edit', { user });
+        return reply;
+      } catch (e) {
+        reply.send(e);
+        return reply;
+      }
     })
     .post('/users', async (req, reply) => {
       try {
@@ -27,15 +36,28 @@ export default (app) => {
         reply.redirect(app.reverse('root'));
         return reply;
       } catch (e) {
-        // console.log('ERROR: ', e);
-        // console.log('DATA: ', e.data);
-        // reply.send(e);
         req.flash('error', i18next.t('flash.users.create.error'));
         reply.render('users/new', { user: req.body.data, errors: e.data });
         return reply;
       }
     })
-    .patch('/users/:id', { name: 'updateUser' }, async (req, reply) => {
-      reply.send('Hello world');
+    .patch('/users/:id', { name: 'editUser' }, async (req, reply) => {
+      try {
+        const { id } = req.params;
+        // console.log()
+        // const user = await app.objection.models.user.query().findById(id);
+        reply.send('hello ,world');
+        return reply;
+      } catch (error) {
+        reply.send(error);
+        return reply;
+      }
+    })
+    .delete('/users/:id', async (req, reply) => {
+      const { id } = req.params;
+      await app.objection.models.user.query().deleteById(id);
+      // reply.send('User was deleted!');
+      reply.redirect(app.reverse('users'));
+      return reply;
     });
 };

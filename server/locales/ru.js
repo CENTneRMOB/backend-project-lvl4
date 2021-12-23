@@ -42,6 +42,7 @@ module.exports = {
         lastName: 'Фамилия',
         password: 'Пароль',
         email: 'Email',
+        fullName: 'Полное имя',
         createdAt: 'Дата создания',
         new: {
           submit: 'Сохранить',

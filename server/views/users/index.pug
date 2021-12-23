@@ -5,6 +5,7 @@ block content
     thead
       tr
         th= t('views.users.id')
+        th= t('views.users.fullName')
         th= t('views.users.email')
         th= t('views.users.createdAt')
         th
@@ -12,8 +13,9 @@ block content
       each user in users
         tr
           td= user.id
+          td= `${user.firstName} ${user.lastName}`
           td= user.email
           td= formatDate(user.createdAt)
-          if isAuthenticated()
             td
-              +buttonTo(route('users'))(class="btn nav-link" value=t('views.users.exist.edit'))
+              a(href=`/users/${user.id}/edit`)= t('views.users.exist.edit')
+              +buttonTo(`/users/${user.id}`, 'delete')(class="btn nav-link" value=t('views.users.exist.delete'))
