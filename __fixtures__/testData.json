@@ -11,6 +11,18 @@
       "lastName": "Akroid",
       "email": "lawrence.kulas87@outlook.com",
       "password": "O6AvLIQL1cbzrre"
+    },
+    "updating": {
+      "firstName": "Dan",
+      "lastName": "Akroid",
+      "email": "lawrence.kulas87@outlook.com",
+      "password": "O6AvLIQL1cbzrre"
+    },
+    "deleting": {
+      "firstName": "Dan",
+      "lastName": "Akroid",
+      "email": "lawrence.kulas87@outlook.com",
+      "password": "O6AvLIQL1cbzrre"
     }
   }
 }

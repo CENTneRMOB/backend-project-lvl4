@@ -62,6 +62,59 @@ describe('test users CRUD', () => {
     expect(user).toMatchObject(expected);
   });
 
+  it('edit', async () => {
+    const params = testData.users.existing;
+    const user = await models.user.query().findOne({ email: params.email });
+    const response = await app.inject({
+      method: 'GET',
+      url: `/users/${user.id}/edit`,
+      payload: {
+        data: params,
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+  });
+
+  it('update', async () => {
+    const newParams = testData.users.new;
+    const params = testData.users.updating;
+    const oldUser = await models.user.query().findOne({ email: params.email });
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('editUser', { id: oldUser.id }),
+      payload: {
+        data: newParams,
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const newUser = await models.user.query().findById(oldUser.id);
+    const expected = {
+      ..._.omit(newParams, 'password'),
+      passwordDigest: encrypt(newParams.password),
+    };
+
+    expect(newUser).toMatchObject(expected);
+  });
+
+  // it('delete', async () => {
+  //   const params = testData.users.deleting;
+  //   const user = await models.user.query().findOne({ email: params.email });
+
+  //   const response = await app.inject({
+  //     method: 'DELETE',
+  //     url: app.reverse('deleteUser', { id: user.id }),
+  //   });
+
+  //   expect(response.statusCode).toBe(302);
+
+  //   const expected = await models.user.query().findById(user.id);
+
+  //   expect(expected).toBeUndefined();
+  // });
+
   afterEach(async () => {
     // после каждого теста откатываем миграции
     await knex.migrate.rollback();

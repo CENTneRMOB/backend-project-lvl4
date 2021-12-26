@@ -16,6 +16,7 @@ block content
           td= `${user.firstName} ${user.lastName}`
           td= user.email
           td= formatDate(user.createdAt)
-            td
-              a(href=`/users/${user.id}/edit`)= t('views.users.exist.edit')
-              +buttonTo(`/users/${user.id}`, 'delete')(class="btn nav-link" value=t('views.users.exist.delete'))
+            if isAuthenticated()
+              td
+                a(href=`/users/${user.id}/edit`)= t('views.users.exist.edit')
+                +buttonTo(`/users/${user.id}`, 'delete')(class="btn nav-link" value=t('views.users.exist.delete'))
