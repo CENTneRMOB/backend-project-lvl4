@@ -22,11 +22,10 @@ module.exports = {
     migrations,
   },
   production: {
-    client: 'sqlite3',
-    connection: {
-      filename: './database.sqlite',
-    },
+    client: 'pg',
+    connection: process.env.PG_CONNECTION_STRING,
     useNullAsDefault: true,
+    searchPath: ['knex', 'public'],
     migrations,
   },
 };

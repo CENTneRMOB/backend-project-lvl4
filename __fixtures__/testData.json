@@ -24,5 +24,16 @@
       "email": "lawrence.kulas87@outlook.com",
       "password": "O6AvLIQL1cbzrre"
     }
+  },
+  "statuses": {
+    "new": {
+      "statusName": "newStatus"
+    },
+    "updating": {
+      "statusName": "updateStatus"
+    },
+    "deleting": {
+      "statusName": "deleteStatus"
+    }
   }
 }

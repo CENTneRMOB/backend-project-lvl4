@@ -11,16 +11,12 @@ export default (app) => {
     })
     .get('/users/new', { name: 'newUser' }, (req, reply) => {
       const user = new app.objection.models.user();
-      // console.log('NEWUSER: ', user);
       reply.render('users/new', { user });
       return reply;
     })
     .get('/users/:id/edit', { preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      // console.log('USER', req.user);
-      // console.log(typeof id, typeof req.user.id);
       if (req.user.id === Number(id)) {
-        // console.log('EDITING........');
         try {
           const user = await app.objection.models.user.query().findById(id);
           reply.render('users/edit', { user });
@@ -54,7 +50,6 @@ export default (app) => {
       const user = await app.objection.models.user.query().findById(id);
 
       try {
-        // console.log('PATCHING........');
         await user.$query().patch(updatedUser);
         req.flash('info', i18next.t('flash.users.edit.success'));
 

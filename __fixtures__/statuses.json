@@ -1,0 +1,14 @@
+[
+  {
+    "statusName": "firstStatus",
+    "userId": 1
+  },
+  {
+    "statusName": "secondStatus",
+    "userId": 2
+  },
+  {
+    "statusName": "thirdStatus",
+    "userId": 3
+  }
+]

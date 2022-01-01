@@ -10,9 +10,14 @@ mixin input(entity, propertyName, errors = {})
   - classLine = 'form-control' + (_.isEmpty(errors) ? '' : ' is-invalid')
   - inputId = getInputId(propertyName)
   .mb-3(class=(errors[propertyName] && 'has-danger'))
-    label(
-      for= inputId
-    )= t(`views.users.${propertyName}`)
+    if propertyName === 'statusName'
+      label(
+        for= inputId
+      )= t(`views.statuses.statusName`)
+    else
+      label(
+        for= inputId
+      )= t(`views.users.${propertyName}`)
     input(
       id= inputId
       name=getInputName(propertyName)

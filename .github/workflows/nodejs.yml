@@ -15,10 +15,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '13.x'
-      - name: npm install, build
+      - name: install and prepare
         run: |
-          make setup
-          make build
+          make install
+          make prepare
       - name: Run linter
         run: make lint
       - name: Run tests
