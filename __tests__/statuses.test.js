@@ -1,19 +1,20 @@
 // @ts-check
 
-import _ from 'lodash';
+// import _ from 'lodash';
 import getApp from '../server/index.js';
-import { getTestData, prepareData } from './helpers/index.js';
+// import { getTestData, prepareData } from './helpers/index.js';
+import { prepareData } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
   let app;
   let knex;
-  let models;
-  const testData = getTestData();
+  // let models;
+  // const testData = getTestData();
 
   beforeAll(async () => {
     app = await getApp();
     knex = app.objection.knex;
-    models = app.objection.models;
+    // models = app.objection.models;
   });
 
   beforeEach(async () => {
