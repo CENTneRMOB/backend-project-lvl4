@@ -19,21 +19,21 @@
       "password": "O6AvLIQL1cbzrre"
     },
     "deleting": {
-      "firstName": "Dan",
-      "lastName": "Akroid",
-      "email": "lawrence.kulas87@outlook.com",
-      "password": "O6AvLIQL1cbzrre"
+      "email": "nona_murray@yahoo.com"
     }
   },
   "statuses": {
     "new": {
       "statusName": "newStatus"
     },
+    "existing": {
+      "statusName": "firstStatus"
+    },
     "updating": {
       "statusName": "updateStatus"
     },
     "deleting": {
-      "statusName": "deleteStatus"
+      "statusName": "thirdStatus"
     }
   }
 }

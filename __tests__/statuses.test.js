@@ -2,19 +2,18 @@
 
 // import _ from 'lodash';
 import getApp from '../server/index.js';
-// import { getTestData, prepareData } from './helpers/index.js';
-import { prepareData } from './helpers/index.js';
+import { getTestData, prepareData } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
   let app;
   let knex;
-  // let models;
-  // const testData = getTestData();
+  let models;
+  const testData = getTestData();
 
   beforeAll(async () => {
     app = await getApp();
     knex = app.objection.knex;
-    // models = app.objection.models;
+    models = app.objection.models;
   });
 
   beforeEach(async () => {
@@ -43,78 +42,73 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  // it.only('create', async () => {
-  //   const params = testData.statuses.new;
-  //   const response = await app.inject({
-  //     method: 'POST',
-  //     url: app.reverse('postStatus'),
-  //     payload: {
-  //       data: params,
-  //     },
-  //   });
+  it('create', async () => {
+    const params = testData.statuses.new;
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('postStatus'),
+      payload: {
+        data: params,
+      },
+    });
 
-  //   expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(302);
 
-  //   const expected = params;
-  //   const status = await models.status.query();
+    const expected = params;
+    const status = await models.status.query().findOne({ statusName: params.statusName });
 
-  //   console.log('EXPECT: ', expected);
-  //   console.log('STATUS: ', status);
-  //   expect(status).toMatchObject(expected);
-  // });
+    expect(status).toMatchObject(expected);
+  });
 
-  // it('edit', async () => {
-  //   const params = testData.users.existing;
-  //   const user = await models.user.query().findOne({ email: params.email });
-  //   const response = await app.inject({
-  //     method: 'GET',
-  //     url: `/users/${user.id}/edit`,
-  //     payload: {
-  //       data: params,
-  //     },
-  //   });
+  it('edit', async () => {
+    const params = testData.statuses.existing;
+    const status = await models.status.query().findOne({ statusName: params.statusName });
+    const response = await app.inject({
+      method: 'GET',
+      url: `/statuses/${status.id}/edit`,
+      payload: {
+        data: params,
+      },
+    });
 
-  //   expect(response.statusCode).toBe(302);
-  // });
+    expect(response.statusCode).toBe(200);
+  });
 
-  // it('update', async () => {
-  //   const newParams = testData.users.new;
-  //   const params = testData.users.updating;
-  //   const oldUser = await models.user.query().findOne({ email: params.email });
-  //   const response = await app.inject({
-  //     method: 'PATCH',
-  //     url: app.reverse('editUser', { id: oldUser.id }),
-  //     payload: {
-  //       data: newParams,
-  //     },
-  //   });
+  it('update', async () => {
+    const newParams = testData.statuses.updating;
+    const params = testData.statuses.existing;
+    const oldStatus = await models.status.query().findOne({ statusName: params.statusName });
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('patchStatus', { id: oldStatus.id }),
+      payload: {
+        data: newParams,
+      },
+    });
 
-  //   expect(response.statusCode).toBe(302);
+    expect(response.statusCode).toBe(302);
 
-  //   const newUser = await models.user.query().findById(oldUser.id);
-  //   const expected = {
-  //     ..._.omit(newParams, 'password'),
-  //     passwordDigest: encrypt(newParams.password),
-  //   };
+    const newStatus = await models.status.query().findById(oldStatus.id);
+    const expected = newParams;
 
-  //   expect(newUser).toMatchObject(expected);
-  // });
+    expect(newStatus).toMatchObject(expected);
+  });
 
-  // it('delete', async () => {
-  //   const params = testData.users.deleting;
-  //   const user = await models.user.query().findOne({ email: params.email });
+  it('delete', async () => {
+    const params = testData.statuses.deleting;
+    const existStatus = await models.status.query().findOne({ statusName: params.statusName });
 
-  //   const response = await app.inject({
-  //     method: 'DELETE',
-  //     url: app.reverse('deleteUser', { id: user.id }),
-  //   });
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('deleteStatus', { id: existStatus.id }),
+    });
 
-  //   expect(response.statusCode).toBe(302);
+    expect(response.statusCode).toBe(302);
 
-  //   const expected = await models.user.query().findById(user.id);
+    const expected = await models.status.query().findById(existStatus.id);
 
-  //   expect(expected).toBeUndefined();
-  // });
+    expect(expected).toBeUndefined();
+  });
 
   afterEach(async () => {
     // после каждого теста откатываем миграции

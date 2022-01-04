@@ -101,16 +101,18 @@ describe('test users CRUD', () => {
 
   // it('delete', async () => {
   //   const params = testData.users.deleting;
-  //   const user = await models.user.query().findOne({ email: params.email });
+  //   const existUser = await models.user.query().findOne({ email: params.email });
+  //   console.log(existUser);
 
   //   const response = await app.inject({
   //     method: 'DELETE',
-  //     url: app.reverse('deleteUser', { id: user.id }),
+  //     url: app.reverse('deleteUser', { id: existUser.id }),
   //   });
 
   //   expect(response.statusCode).toBe(302);
 
-  //   const expected = await models.user.query().findById(user.id);
+  //   const expected = await models.user.query().findById(existUser.id);
+  //   console.log(expected);
 
   //   expect(expected).toBeUndefined();
   // });

@@ -1,14 +1,11 @@
 [
   {
-    "statusName": "firstStatus",
-    "userId": 1
+    "statusName": "firstStatus"
   },
   {
-    "statusName": "secondStatus",
-    "userId": 2
+    "statusName": "secondStatus"
   },
   {
-    "statusName": "thirdStatus",
-    "userId": 3
+    "statusName": "thirdStatus"
   }
 ]

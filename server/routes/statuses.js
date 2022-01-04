@@ -28,7 +28,7 @@ export default (app) => {
     .post('/statuses', { name: 'postStatus' }, async (req, reply) => {
       try {
         const status = await app.objection.models.status.fromJson(req.body.data);
-        status.userId = req.user.id;
+        // status.userId = req.user.id;
         await app.objection.models.status.query().insert(status);
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect('/statuses');
@@ -58,13 +58,13 @@ export default (app) => {
     })
     .delete('/statuses/:id', { name: 'deleteStatus' }, async (req, reply) => {
       const { id } = req.params;
-      const userId = req.user.id;
+      // const userId = req.user.id;
       const status = await app.objection.models.status.query().findById(id);
-      if (userId !== status.userId) {
-        req.flash('error', i18next.t('flash.statuses.delete.error'));
-        reply.redirect(app.reverse('statuses'));
-        return reply;
-      }
+      // if (userId !== status.userId) {
+      //   req.flash('error', i18next.t('flash.statuses.delete.error'));
+      //   reply.redirect(app.reverse('statuses'));
+      //   return reply;
+      // }
 
       try {
         await app.objection.models.status.query().deleteById(id);
