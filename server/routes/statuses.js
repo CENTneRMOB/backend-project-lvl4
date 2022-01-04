@@ -59,7 +59,7 @@ export default (app) => {
     .delete('/statuses/:id', { name: 'deleteStatus' }, async (req, reply) => {
       const { id } = req.params;
       // const userId = req.user.id;
-      const status = await app.objection.models.status.query().findById(id);
+      // const status = await app.objection.models.status.query().findById(id);
       // if (userId !== status.userId) {
       //   req.flash('error', i18next.t('flash.statuses.delete.error'));
       //   reply.redirect(app.reverse('statuses'));
