@@ -2,6 +2,7 @@
 
 import { Model } from 'objection';
 import objectionUnique from 'objection-unique';
+import path from 'path';
 
 import encrypt from '../lib/secure.js';
 
@@ -10,6 +11,25 @@ const unique = objectionUnique({ fields: ['email'] });
 export default class User extends unique(Model) {
   static get tableName() {
     return 'users';
+  }
+
+  static relationMappings = {
+    taskCreator: {
+      relation: Model.HasManyRelation,
+      modelClass: path.join(__dirname, 'Task.js'),
+      join: {
+        from: 'users.id',
+        to: 'tasks.creator_id',
+      },
+    },
+    taskExecutor: {
+      relation: Model.HasManyRelation,
+      modelClass: path.join(__dirname, 'Task.js'),
+      join: {
+        from: 'users.id',
+        to: 'tasks.executor_id',
+      },
+    },
   }
 
   static get jsonSchema() {

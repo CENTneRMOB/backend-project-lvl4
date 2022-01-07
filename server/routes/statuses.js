@@ -58,13 +58,14 @@ export default (app) => {
     })
     .delete('/statuses/:id', { name: 'deleteStatus' }, async (req, reply) => {
       const { id } = req.params;
-      // const userId = req.user.id;
-      // const status = await app.objection.models.status.query().findById(id);
-      // if (userId !== status.userId) {
-      //   req.flash('error', i18next.t('flash.statuses.delete.error'));
-      //   reply.redirect(app.reverse('statuses'));
-      //   return reply;
-      // }
+      const userId = req.user.id;
+      const status = await app.objection.models.status.query().findById(id);
+      const { taskStatus } = await app.objection.models.status.query().findById(id).withGraphJoined('[taskStatus]');
+      if (userId !== status.userId || taskStatus.length !== 0) {
+        req.flash('error', i18next.t('flash.statuses.delete.error'));
+        reply.redirect(app.reverse('statuses'));
+        return reply;
+      }
 
       try {
         await app.objection.models.status.query().deleteById(id);

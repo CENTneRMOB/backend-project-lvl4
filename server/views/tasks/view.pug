@@ -1,0 +1,27 @@
+extends ../layouts/application2.pug
+
+block content
+  h1.my-4
+  .card
+    .card-header.bg-secondary.text-white
+      h2= task.name
+    .card-body.bg-light
+      p
+      hr
+      .container
+        .row.p-1
+          .col= t('views.tasks.author')
+          .col= `${task.creator.firstName} ${task.creator.lastName}`
+        .row.p-1
+          .col= t('views.tasks.executor')
+          .col= `${task.executor.firstName} ${task.executor.lastName}`
+        .row.p-1
+          .col= t('views.tasks.status')
+          .col= task.status.name
+        .row.p-1
+          .col= t('views.tasks.createdAt')
+          .col= formatDate(task.createdAt)
+        .row.p-1
+          .col
+            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.exist.edit')
+            +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-link" value=t('views.tasks.exist.delete'))

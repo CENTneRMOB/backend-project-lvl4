@@ -1,0 +1,12 @@
+extends ../layouts/application2.pug
+
+block header
+  = t('views.tasks.new.creating')
+
+block content
+  +formFor()(action=route('postTask') method='post')
+    +input(task, 'name', errors)(type="text")
+    +textarea(task, 'description', errors)(type="text")
+    +select(task, statuses, 'status', errors)
+    +select(task, users, 'executor', errors)
+    +submit(task)(value=t('views.tasks.new.createConfirm'))

@@ -6,14 +6,14 @@ block content
     thead
       tr
         th= t('views.statuses.id')
-        th= t('views.statuses.statusName')
+        th= t('views.statuses.name')
         th= t('views.statuses.createdAt')
         th
     tbody
       each status in statuses
         tr
           td= status.id
-          td= status.statusName
+          td= status.name
           td= formatDate(status.createdAt)
           td
             a(href=`/statuses/${status.id}/edit`)= t('views.statuses.exist.edit')

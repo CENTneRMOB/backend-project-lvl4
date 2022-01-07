@@ -1,0 +1,27 @@
+extends ../layouts/application2.pug
+
+block content
+  a(href=route('newTask'))= t('views.tasks.new.create')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.tasks.id')
+        th= t('views.tasks.name')
+        th= t('views.tasks.status')
+        th= t('views.tasks.author')
+        th= t('views.tasks.executor')
+        th= t('views.tasks.createdAt')
+        th
+    tbody
+      each task in tasks
+        tr
+          td= task.id
+          td
+            a(href=`/tasks/${task.id}`)= task.name
+          td= task.status.name
+          td= `${task.creator.firstName} ${task.creator.lastName}`
+          td= `${task.executor.firstName} ${task.executor.lastName}`
+          td= formatDate(task.createdAt)
+          td
+            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.exist.edit')
+            +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-link" value=t('views.tasks.exist.delete'))

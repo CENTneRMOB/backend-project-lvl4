@@ -24,16 +24,16 @@
   },
   "statuses": {
     "new": {
-      "statusName": "newStatus"
+      "name": "newStatus"
     },
     "existing": {
-      "statusName": "firstStatus"
+      "name": "firstStatus"
     },
     "updating": {
-      "statusName": "updateStatus"
+      "name": "updateStatus"
     },
     "deleting": {
-      "statusName": "thirdStatus"
+      "name": "thirdStatus"
     }
   }
 }
