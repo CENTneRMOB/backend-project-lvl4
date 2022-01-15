@@ -5,6 +5,6 @@ block header
 
 block content
   +formFor()(action=route('patchStatus', { id: status.id }) method='post')
-    +input(status, 'name', errors)(type="text")
+    +input(status, 'name', errors, 'statuses')(type="text")
     input(name='_method' type='hidden' value='patch')
     +submit(status)(value=t('views.statuses.exist.edit'))

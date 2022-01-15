@@ -13,14 +13,18 @@ block content
           .col= t('views.tasks.author')
           .col= `${task.creator.firstName} ${task.creator.lastName}`
         .row.p-1
-          .col= t('views.tasks.executor')
-          .col= `${task.executor.firstName} ${task.executor.lastName}`
+          .col= t('views.tasks.executorId')
+          .col= task.executor ? `${task.executor.firstName} ${task.executor.lastName}` :  ''
         .row.p-1
-          .col= t('views.tasks.status')
+          .col= t('views.tasks.statusId')
           .col= task.status.name
         .row.p-1
           .col= t('views.tasks.createdAt')
           .col= formatDate(task.createdAt)
+        .row.p-1
+          .col
+            h6= t('views.tasks.labels')
+            +list(task.labels)
         .row.p-1
           .col
             a(href=`/tasks/${task.id}/edit`)= t('views.tasks.exist.edit')

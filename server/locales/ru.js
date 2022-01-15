@@ -43,7 +43,7 @@ module.exports = {
       },
       tasks: {
         create: {
-          error: '',
+          error: 'Не удалось создать задачу',
           success: 'Задача успешно создана',
         },
         edit: {
@@ -53,6 +53,20 @@ module.exports = {
         delete: {
           error: 'Не удалось удалить задачу',
           success: 'Задача успешно удалена',
+        },
+      },
+      labels: {
+        create: {
+          error: 'Не удалось создать метку',
+          success: 'Метка успешно создана',
+        },
+        edit: {
+          error: 'Не удалось изменить метку',
+          success: 'Метка успешно изменена',
+        },
+        delete: {
+          error: 'Не удалось удалить метку',
+          success: 'Метка успешно удалена',
         },
       },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
@@ -66,6 +80,7 @@ module.exports = {
         signOut: 'Выход',
         statuses: 'Статусы',
         tasks: 'Задачи',
+        labels: 'Метки',
       },
     },
     views: {
@@ -119,11 +134,11 @@ module.exports = {
         id: 'ID',
         name: 'Наименование',
         description: 'Описание',
-        status: 'Статус',
+        statusId: 'Статус',
         author: 'Автор',
-        executor: 'Исполнитель',
+        executorId: 'Исполнитель',
         createdAt: 'Дата создания',
-        label: 'Метка',
+        labels: 'Метки',
         new: {
           create: 'Создать задачу',
           creating: 'Создание задачи',
@@ -133,6 +148,21 @@ module.exports = {
           edit: 'Изменить',
           delete: 'Удалить',
           editing: 'Изменение задачи',
+        },
+      },
+      labels: {
+        id: 'ID',
+        name: 'Наименование',
+        createdAt: 'Дата создания',
+        exist: {
+          editing: 'Изменение метки',
+          edit: 'Изменить',
+          delete: 'Удалить',
+        },
+        new: {
+          create: 'Создать метку',
+          creating: 'Создание метки',
+          createConfirm: 'Создать',
         },
       },
     },

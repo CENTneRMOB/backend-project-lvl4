@@ -1,0 +1,20 @@
+extends ../layouts/application2.pug
+
+block content
+  a(href=route('newLabel'))= t('views.labels.new.create')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.labels.id')
+        th= t('views.labels.name')
+        th= t('views.labels.createdAt')
+        th
+    tbody
+      each label in labels
+        tr
+          td= label.id
+          td= label.name
+          td= formatDate(label.createdAt)
+          td
+            a(href=`/labels/${label.id}/edit`)= t('views.labels.exist.edit')
+            +buttonTo(`/labels/${label.id}`, 'delete')(class="btn btn-link" value=t('views.labels.exist.delete'))

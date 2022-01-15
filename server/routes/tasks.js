@@ -8,20 +8,21 @@ export default (app) => {
       const tasks = await app.objection.models.task.query().withGraphJoined('[creator, executor, status]');
 
       reply.render('tasks/index', { tasks });
-      // reply.send({ tasks });
       return reply;
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
+      const labels = await app.objection.models.label.query();
       const task = new app.objection.models.task();
-      reply.render('tasks/new', { task, statuses, users });
-      // reply.send({ hello: 'new' });
+      reply.render('tasks/new', {
+        task, statuses, users, labels,
+      });
       return reply;
     })
     .get('/tasks/:id', { name: 'viewTask' }, async (req, reply) => {
       const { id } = req.params;
-      const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status]');
+      const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status, labels]');
       reply.render('tasks/view', { task });
       return reply;
     })
@@ -30,9 +31,11 @@ export default (app) => {
       try {
         const statuses = await app.objection.models.status.query();
         const users = await app.objection.models.user.query();
-        const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status]');
-        reply.render('tasks/edit', { task, statuses, users });
-        // reply.send(task);
+        const labels = await app.objection.models.label.query();
+        const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status, labels]');
+        reply.render('tasks/edit', {
+          task, statuses, users, labels,
+        });
         return reply;
       } catch (error) {
         reply.send(error);
@@ -40,61 +43,107 @@ export default (app) => {
       }
     })
     .post('/tasks', { name: 'postTask' }, async (req, reply) => {
-      const {
-        name,
-        description,
-        status,
-        executor,
-      } = req.body.data;
-
-      const dataObj = {
-        name,
-        description,
-        statusId: Number(status),
-        executorId: Number(executor),
-        creatorId: req.user.id,
-      };
-
       try {
+        const {
+          name,
+          description,
+          statusId,
+          executorId,
+          labels,
+        } = req.body.data;
+
+        let labelsData;
+
+        if (typeof labels === 'string') {
+          labelsData = [Number(labels)];
+        } else {
+          labelsData = !labels ? [] : labels.map((labelId) => Number(labelId));
+        }
+
+        const dataObj = {
+          name,
+          description,
+          statusId: Number(statusId),
+          executorId: executorId.length === 0 ? null : Number(executorId),
+          creatorId: req.user.id,
+          labelsId: labelsData,
+        };
+
         const task = await app.objection.models.task.fromJson(dataObj);
         await app.objection.models.task.query().insert(task);
+
+        task.labelsId
+          .map((labelId) => ({ taskId: task.id, labelId }))
+          .forEach(async (item) => {
+            await app.objection.models.tasklabel.query().insert(item);
+          });
+
         req.flash('info', i18next.t('flash.tasks.create.success'));
-        reply.redirect('/tasks');
+        reply.redirect(app.reverse('tasks'));
         return reply;
       } catch (error) {
-        reply.send(error);
+        const statuses = await app.objection.models.status.query();
+        const users = await app.objection.models.user.query();
+        const labels = await app.objection.models.label.query();
+
+        req.flash('error', i18next.t('flash.tasks.create.error'));
+        reply.render('tasks/new', {
+          task: req.body.data, statuses, users, labels, errors: error.data,
+        });
         return reply;
       }
-      // reply.send(dataObj);
-      // return reply;
     })
     .patch('/tasks/:id', { name: 'patchTask' }, async (req, reply) => {
-      const {
-        name,
-        description,
-        status,
-        executor,
-      } = req.body.data;
-      const dataObj = {
-        name,
-        description,
-        statusId: Number(status),
-        executorId: Number(executor),
-        creatorId: req.user.id,
-      };
-      const { id } = req.params;
-      const task = await app.objection.models.task.query().findById(id);
-
       try {
-        await task.$query().patch(dataObj);
-        req.flash('info', i18next.t('flash.tasks.edit.success'));
+        const {
+          name,
+          description,
+          statusId,
+          executorId,
+          labels,
+        } = req.body.data;
 
+        let labelsData;
+        console.log('lslasllllllllllasllassssssssss', typeof labels);
+        if (typeof labels === 'string') {
+          labelsData = labels.length === 0 ? [] : [Number(labels)];
+        } else {
+          labelsData = !labels ? [] : labels.map((labelId) => Number(labelId));
+        }
+
+        const dataObj = {
+          name,
+          description,
+          statusId: Number(statusId),
+          executorId: executorId.length === 0 ? null : Number(executorId),
+          creatorId: req.user.id,
+          labelsId: labelsData,
+        };
+
+        const { id } = req.params;
+        const task = await app.objection.models.task.query().findById(id).withGraphJoined('labels');
+        await app.objection.models.tasklabel.query().delete().where('task_id', '=', task.id);
+
+        labelsData
+          .map((labelId) => ({ taskId: Number(id), labelId }))
+          .forEach(async (item) => {
+            await app.objection.models.tasklabel.query().insert(item);
+          });
+
+        await task.$query().patch(dataObj);
+
+        req.flash('info', i18next.t('flash.tasks.edit.success'));
         reply.redirect(app.reverse('tasks'));
-        // reply.send({ hello: 'patch' });
         return reply;
       } catch (error) {
+        const statuses = await app.objection.models.status.query();
+        const users = await app.objection.models.user.query();
+        const labels = await app.objection.models.label.query();
+
         req.flash('error', i18next.t('flash.tasks.edit.error'));
-        reply.render('tasks/edit', { status, errors: error.data });
+        reply.render('tasks/new', {
+          task: req.body.data, statuses, users, labels, errors: error.data,
+        });
         return reply;
       }
     })
@@ -109,6 +158,7 @@ export default (app) => {
       }
       try {
         await app.objection.models.task.query().deleteById(id);
+        await app.objection.models.tasklabel.query().delete().where('task_id', '=', id);
         req.flash('info', i18next.t('flash.tasks.delete.success'));
         reply.redirect(app.reverse('tasks'));
         return reply;
@@ -116,7 +166,5 @@ export default (app) => {
         reply.send(error);
         return reply;
       }
-      // reply.send({ hello: 'delete' });
-      // return reply;
     });
 };

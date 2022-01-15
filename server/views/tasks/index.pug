@@ -7,9 +7,9 @@ block content
       tr
         th= t('views.tasks.id')
         th= t('views.tasks.name')
-        th= t('views.tasks.status')
+        th= t('views.tasks.statusId')
         th= t('views.tasks.author')
-        th= t('views.tasks.executor')
+        th= t('views.tasks.executorId')
         th= t('views.tasks.createdAt')
         th
     tbody
@@ -20,7 +20,7 @@ block content
             a(href=`/tasks/${task.id}`)= task.name
           td= task.status.name
           td= `${task.creator.firstName} ${task.creator.lastName}`
-          td= `${task.executor.firstName} ${task.executor.lastName}`
+          td= task.executor ? `${task.executor.firstName} ${task.executor.lastName}` :  ''
           td= formatDate(task.createdAt)
           td
             a(href=`/tasks/${task.id}/edit`)= t('views.tasks.exist.edit')

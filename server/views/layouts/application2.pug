@@ -60,6 +60,11 @@ html(lang='en')
                     use(xlink:href='#gear-fill')
                   | #{t('layouts.application.statuses')}
               li.nav-item
+                a.nav-link.link-dark(href=route('labels'))
+                  svg.bi.me-2(width='16' height='16')
+                    use(xlink:href='#gear-fill')
+                  | #{t('layouts.application.labels')}
+              li.nav-item
                 a.nav-link.link-dark(href=route('tasks'))
                   svg.bi.me-2(width='16' height='16')
                     use(xlink:href='#gear-fill')

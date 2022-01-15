@@ -5,9 +5,10 @@ block header
 
 block content
   +formFor()(action=route('patchTask', { id: task.id }) method='post')
-    +input(task, 'name', errors)(type="text")
-    +textarea(task, 'description', errors)(type="text")
-    +select(task, statuses, 'status', errors)
-    +select(task, users, 'executor', errors)
+    +input(task, 'name', errors, 'tasks')(type="text")
+    +textarea(task, 'description', errors, 'tasks')(type="text")
+    +select(task, statuses, 'statusId', errors, 'tasks')
+    +select(task, users, 'executorId', errors, 'tasks')
+    +select(task, labels, 'labels', errors, 'tasks')
     input(name='_method' type='hidden' value='patch')
     +submit(task)(value=t('views.tasks.exist.edit'))
