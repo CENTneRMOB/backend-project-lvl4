@@ -84,7 +84,9 @@ module.exports = {
       },
     },
     views: {
-      session: {
+      sessions: {
+        email: 'Email',
+        password: 'Пароль',
         new: {
           signIn: 'Вход',
           submit: 'Войти',

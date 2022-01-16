@@ -4,17 +4,17 @@ import i18next from 'i18next';
 
 export default (app) => {
   app
-    .get('/statuses', { name: 'statuses' }, async (req, reply) => {
+    .get('/statuses', { name: 'statuses', preValidation: app.authenticate }, async (req, reply) => {
       const statuses = await app.objection.models.status.query();
       reply.render('statuses/index', { statuses });
       return reply;
     })
-    .get('/statuses/new', { name: 'newStatus' }, async (req, reply) => {
+    .get('/statuses/new', { name: 'newStatus', preValidation: app.authenticate }, async (req, reply) => {
       const status = new app.objection.models.status();
       reply.render('statuses/new', { status });
       return reply;
     })
-    .get('/statuses/:id/edit', { name: 'editStatus' }, async (req, reply) => {
+    .get('/statuses/:id/edit', { name: 'editStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       try {
         const status = await app.objection.models.status.query().findById(id);
@@ -25,7 +25,7 @@ export default (app) => {
         return reply;
       }
     })
-    .post('/statuses', { name: 'postStatus' }, async (req, reply) => {
+    .post('/statuses', { name: 'postStatus', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const status = await app.objection.models.status.fromJson(req.body.data);
         // status.userId = req.user.id;
@@ -39,7 +39,7 @@ export default (app) => {
         return reply;
       }
     })
-    .patch('/statuses/:id', { name: 'patchStatus' }, async (req, reply) => {
+    .patch('/statuses/:id', { name: 'patchStatus', preValidation: app.authenticate }, async (req, reply) => {
       const inputData = req.body.data;
       const { id } = req.params;
       const status = await app.objection.models.status.query().findById(id);
@@ -56,7 +56,7 @@ export default (app) => {
         return reply;
       }
     })
-    .delete('/statuses/:id', { name: 'deleteStatus' }, async (req, reply) => {
+    .delete('/statuses/:id', { name: 'deleteStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const userId = req.user.id;
       const status = await app.objection.models.status.query().findById(id);

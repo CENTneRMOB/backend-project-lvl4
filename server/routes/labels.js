@@ -4,17 +4,17 @@ import i18next from 'i18next';
 
 export default (app) => {
   app
-    .get('/labels', { name: 'labels' }, async (req, reply) => {
+    .get('/labels', { name: 'labels', preValidation: app.authenticate }, async (req, reply) => {
       const labels = await app.objection.models.label.query();
       reply.render('labels/index', { labels });
       return reply;
     })
-    .get('/labels/new', { name: 'newLabel' }, async (req, reply) => {
+    .get('/labels/new', { name: 'newLabel', preValidation: app.authenticate }, async (req, reply) => {
       const label = new app.objection.models.label();
       reply.render('labels/new', { label });
       return reply;
     })
-    .get('/labels/:id/edit', { name: 'editLabel' }, async (req, reply) => {
+    .get('/labels/:id/edit', { name: 'editLabel', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       try {
         const label = await app.objection.models.label.query().findById(id);
@@ -25,7 +25,7 @@ export default (app) => {
         return reply;
       }
     })
-    .post('/labels', { name: 'postLabel' }, async (req, reply) => {
+    .post('/labels', { name: 'postLabel', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const label = await app.objection.models.label.fromJson(req.body.data);
         await app.objection.models.label.query().insert(label);
@@ -38,7 +38,7 @@ export default (app) => {
         return reply;
       }
     })
-    .patch('/labels/:id', { name: 'patchLabel' }, async (req, reply) => {
+    .patch('/labels/:id', { name: 'patchLabel', preValidation: app.authenticate }, async (req, reply) => {
       const inputData = req.body.data;
       const { id } = req.params;
       const label = await app.objection.models.label.query().findById(id);
@@ -55,7 +55,7 @@ export default (app) => {
         return reply;
       }
     })
-    .delete('/labels/:id', { name: 'deleteLabel' }, async (req, reply) => {
+    .delete('/labels/:id', { name: 'deleteLabel', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const { taskLabel } = await app.objection.models.label.query().findById(id).withGraphJoined('[taskLabel]');
       if (taskLabel.length !== 0) {

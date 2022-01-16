@@ -4,13 +4,13 @@ import i18next from 'i18next';
 
 export default (app) => {
   app
-    .get('/tasks', { name: 'tasks' }, async (req, reply) => {
+    .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
       const tasks = await app.objection.models.task.query().withGraphJoined('[creator, executor, status]');
 
       reply.render('tasks/index', { tasks });
       return reply;
     })
-    .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
+    .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
       const labels = await app.objection.models.label.query();
@@ -20,13 +20,13 @@ export default (app) => {
       });
       return reply;
     })
-    .get('/tasks/:id', { name: 'viewTask' }, async (req, reply) => {
+    .get('/tasks/:id', { name: 'viewTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status, labels]');
       reply.render('tasks/view', { task });
       return reply;
     })
-    .get('/tasks/:id/edit', { name: 'editTask' }, async (req, reply) => {
+    .get('/tasks/:id/edit', { name: 'editTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       try {
         const statuses = await app.objection.models.status.query();
@@ -42,7 +42,7 @@ export default (app) => {
         return reply;
       }
     })
-    .post('/tasks', { name: 'postTask' }, async (req, reply) => {
+    .post('/tasks', { name: 'postTask', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const {
           name,
@@ -93,7 +93,7 @@ export default (app) => {
         return reply;
       }
     })
-    .patch('/tasks/:id', { name: 'patchTask' }, async (req, reply) => {
+    .patch('/tasks/:id', { name: 'patchTask', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const {
           name,
@@ -147,7 +147,7 @@ export default (app) => {
         return reply;
       }
     })
-    .delete('/tasks/:id', { name: 'deleteTask' }, async (req, reply) => {
+    .delete('/tasks/:id', { name: 'deleteTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const task = await app.objection.models.task.query().findById(id);
       const userId = req.user.id;

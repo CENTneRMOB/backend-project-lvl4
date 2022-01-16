@@ -1,10 +1,14 @@
-# fastify-nodejs-application
-
+# Task manager application made with Fastify and Node.js
 [![Node CI](https://github.com/hexlet-boilerplates/fastify-nodejs-application/workflows/Node%20CI/badge.svg)](https://github.com/hexlet-boilerplates/fastify-nodejs-application/actions)
 
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/CENTneRMOB/backend-project-lvl4/workflows/hexlet-check/badge.svg)](https://github.com/CENTneRMOB/backend-project-lvl4/actions)
 
-# Домен
+### Codeclimate maintainability:
+[![Maintainability](https://api.codeclimate.com/v1/badges/9abd7bb980d0ca4f9bbe/maintainability)](https://codeclimate.com/github/CENTneRMOB/backend-project-lvl4/maintainability)
 
-[Heroku](https://agile-brook-37932.herokuapp.com/)
+<!-- ### Codeclimate test coverage:
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ff6f2ad5a0cfcd4eb17c/test_coverage)](https://codeclimate.com/github/CENTneRMOB/backend-project-lvl3/test_coverage) -->
+
+# Task manager link
+[Task manager](https://agile-brook-37932.herokuapp.com/)
