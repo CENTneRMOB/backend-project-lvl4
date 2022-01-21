@@ -19,7 +19,8 @@
       "password": "O6AvLIQL1cbzrre"
     },
     "deleting": {
-      "email": "nona_murray@yahoo.com"
+      "email": "lawrence.kulas95@outlook.com",
+      "password": "O6AvLIQL1cbzrre"
     }
   },
   "statuses": {
@@ -34,6 +35,25 @@
     },
     "deleting": {
       "name": "thirdStatus"
+    }
+  },
+  "tasks": {
+    "new": {
+      "name": "newTask",
+      "description": "new task description",
+      "statusId": 3,
+      "executorId": 2
+    },
+    "existing": {
+      "name": "task2"
+    },
+    "updating": {
+      "name": "updateTask",
+      "description": "update description for task",
+      "executorId": 3
+    },
+    "deleting": {
+      "name": "task3"
     }
   }
 }

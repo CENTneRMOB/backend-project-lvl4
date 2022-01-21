@@ -31,7 +31,7 @@ export default (app) => {
       reply.redirect(app.reverse('users'));
       return reply;
     })
-    .post('/users', { preValidation: app.authenticate }, async (req, reply) => {
+    .post('/users', async (req, reply) => {
       try {
         const user = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().insert(user);

@@ -28,7 +28,6 @@ export default (app) => {
     .post('/statuses', { name: 'postStatus', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const status = await app.objection.models.status.fromJson(req.body.data);
-        // status.userId = req.user.id;
         await app.objection.models.status.query().insert(status);
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect('/statuses');
@@ -59,9 +58,9 @@ export default (app) => {
     .delete('/statuses/:id', { name: 'deleteStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const userId = req.user.id;
-      const status = await app.objection.models.status.query().findById(id);
+      // const status = await app.objection.models.status.query().findById(id);
       const { taskStatus } = await app.objection.models.status.query().findById(id).withGraphJoined('[taskStatus]');
-      if (userId !== status.userId || taskStatus.length !== 0) {
+      if (!userId || taskStatus.length !== 0) {
         req.flash('error', i18next.t('flash.statuses.delete.error'));
         reply.redirect(app.reverse('statuses'));
         return reply;

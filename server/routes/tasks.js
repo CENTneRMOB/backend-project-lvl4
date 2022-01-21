@@ -104,7 +104,6 @@ export default (app) => {
         } = req.body.data;
 
         let labelsData;
-        console.log('lslasllllllllllasllassssssssss', typeof labels);
         if (typeof labels === 'string') {
           labelsData = labels.length === 0 ? [] : [Number(labels)];
         } else {
@@ -131,7 +130,6 @@ export default (app) => {
           });
 
         await task.$query().patch(dataObj);
-
         req.flash('info', i18next.t('flash.tasks.edit.success'));
         reply.redirect(app.reverse('tasks'));
         return reply;

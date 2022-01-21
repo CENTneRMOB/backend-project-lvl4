@@ -4,7 +4,7 @@
 import getApp from '../server/index.js';
 import { getTestData, prepareData, signIn } from './helpers/index.js';
 
-describe('test statuses CRUD', () => {
+describe('test tasks CRUD', () => {
   let app;
   let knex;
   let models;
@@ -31,7 +31,7 @@ describe('test statuses CRUD', () => {
   it('index', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('statuses'),
+      url: app.reverse('tasks'),
       cookies,
     });
     expect(response.statusCode).toBe(200);
@@ -40,7 +40,7 @@ describe('test statuses CRUD', () => {
   it('new', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('newStatus'),
+      url: app.reverse('newTask'),
       cookies,
     });
 
@@ -48,30 +48,30 @@ describe('test statuses CRUD', () => {
   });
 
   it('create', async () => {
-    const newStatus = testData.statuses.new;
+    const newTask = testData.tasks.new;
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('postStatus'),
+      url: app.reverse('postTask'),
       payload: {
-        data: newStatus,
+        data: newTask,
       },
       cookies,
     });
 
     expect(response.statusCode).toBe(302);
 
-    const expected = newStatus;
-    const status = await models.status.query().findOne({ name: newStatus.name });
+    const expected = newTask;
+    const task = await models.task.query().findOne({ name: newTask.name });
 
-    expect(status).toMatchObject(expected);
+    expect(task).toMatchObject(expected);
   });
 
   it('edit', async () => {
-    const params = testData.statuses.existing;
-    const status = await models.status.query().findOne({ name: params.name });
+    const params = testData.tasks.existing;
+    const task = await models.task.query().findOne({ name: params.name });
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('editStatus', { id: status.id }),
+      url: app.reverse('editTask', { id: task.id }),
       payload: {
         data: params,
       },
@@ -82,39 +82,40 @@ describe('test statuses CRUD', () => {
   });
 
   it('update', async () => {
-    const newParams = testData.statuses.updating; // updateStatus
-    const params = testData.statuses.existing; // firstStatus
-    const oldStatus = await models.status.query().findOne({ name: params.name });
+    const newParams = testData.tasks.updating;
+    const params = testData.tasks.existing;
+    const oldTask = await models.task.query().findOne({ name: params.name });
+    const data = Object.assign(oldTask, newParams);
     const response = await app.inject({
       method: 'PATCH',
-      url: app.reverse('patchStatus', { id: oldStatus.id }),
+      url: app.reverse('patchTask', { id: oldTask.id }),
       payload: {
-        data: newParams,
+        data,
       },
       cookies,
     });
 
     expect(response.statusCode).toBe(302);
 
-    const newStatus = await models.status.query().findById(oldStatus.id);
+    const newTask = await models.task.query().findById(oldTask.id);
     const expected = newParams;
 
-    expect(newStatus).toMatchObject(expected);
+    expect(newTask).toMatchObject(expected);
   });
 
   it('delete', async () => {
-    const params = testData.statuses.deleting; // thirdStatus
-    const existStatus = await models.status.query().findOne({ name: params.name });
+    const params = testData.tasks.deleting;
+    const existTask = await models.task.query().findOne({ name: params.name });
 
     const response = await app.inject({
       method: 'DELETE',
-      url: app.reverse('deleteStatus', { id: existStatus.id }),
+      url: app.reverse('deleteTask', { id: existTask.id }),
       cookies,
     });
 
     expect(response.statusCode).toBe(302);
 
-    const expected = await models.status.query().findById(existStatus.id);
+    const expected = await models.task.query().findById(existTask.id);
 
     expect(expected).toBeUndefined();
   });
