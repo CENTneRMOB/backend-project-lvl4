@@ -28,13 +28,8 @@ export const signIn = async (app, user) => {
       data: { email, password },
     },
   });
-
-  // после успешной аутентификации получаем куки из ответа,
-  // они понадобятся для выполнения запросов на маршруты требующие
-  // предварительную аутентификацию
   const [sessionCookie] = responseSignIn.cookies;
   const { name, value } = sessionCookie;
   const cookie = { [name]: value };
-  // console.log('cookie', cookie);
   return cookie;
 };

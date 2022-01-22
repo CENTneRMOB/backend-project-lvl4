@@ -7,8 +7,8 @@
 ### Codeclimate maintainability:
 [![Maintainability](https://api.codeclimate.com/v1/badges/9abd7bb980d0ca4f9bbe/maintainability)](https://codeclimate.com/github/CENTneRMOB/backend-project-lvl4/maintainability)
 
-<!-- ### Codeclimate test coverage:
-[![Test Coverage](https://api.codeclimate.com/v1/badges/ff6f2ad5a0cfcd4eb17c/test_coverage)](https://codeclimate.com/github/CENTneRMOB/backend-project-lvl3/test_coverage) -->
+### Codeclimate test coverage:
+[![Test Coverage](https://api.codeclimate.com/v1/badges/9abd7bb980d0ca4f9bbe/test_coverage)](https://codeclimate.com/github/CENTneRMOB/backend-project-lvl4/test_coverage)
 
 # Task manager link
 [Task manager](https://agile-brook-37932.herokuapp.com/)
