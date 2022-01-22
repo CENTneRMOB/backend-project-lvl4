@@ -16,6 +16,7 @@ export const prepareData = async (app) => {
   await knex('users').insert(getFixtureData('users.json'));
   await knex('statuses').insert(getFixtureData('statuses.json'));
   await knex('tasks').insert(getFixtureData('tasks.json'));
+  await knex('labels').insert(getFixtureData('labels.json'));
 };
 
 export const signIn = async (app, user) => {

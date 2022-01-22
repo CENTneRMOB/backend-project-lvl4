@@ -55,5 +55,19 @@
     "deleting": {
       "name": "task3"
     }
+  },
+  "labels": {
+    "new": {
+      "name": "newLabel"
+    },
+    "existing": {
+      "name": "firstLabel"
+    },
+    "updating": {
+      "name": "updateLabel"
+    },
+    "deleting": {
+      "name": "thirdLabel"
+    }
   }
 }
