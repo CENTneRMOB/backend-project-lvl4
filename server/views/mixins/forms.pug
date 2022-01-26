@@ -15,6 +15,12 @@
 -
 -   return false;
 - }
+- const isSelectedFilter = (item, queryParams, itemType) => {
+-   if (_.has(queryParams, itemType) && item.id === queryParams[itemType]) {
+-     return true;
+-   }
+-   return false;
+- }
 
 mixin formFor(entity = null)
   form&attributes(attributes)
@@ -81,9 +87,9 @@ mixin select(entity, items, propertyName, errors = {}, entityType)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
 mixin submit(form = null)
-  input(class='btn btn-primary' type='submit')&attributes(attributes)
+  input(class='btn btn-dark' type='submit')&attributes(attributes)
 
-mixin buttonTo(action, method)
+mixin buttonTo(action, method, entityType)
   form(action=action, method="post")
     input(name="_method" type="hidden" value=method)
     input(type='submit')&attributes(attributes)
@@ -92,3 +98,27 @@ mixin list(items)
   ul
     each item in items
       li= item.name
+
+mixin checkbox(name, queryParams = {})
+  - inputId = getInputId(name)
+  input(id=inputId class='form-check-input' type='checkbox' name=name checked=(
+    _.has(queryParams, 'creator') ? 'on' : false
+  ))
+  label(class= 'form-check-label' for= inputId)= t(`views.tasks.${name}`)
+
+mixin filterSelect(items, propertyName, itemType, queryParams = {})
+  - classLine = 'form-control ml-2 mr3'
+  - inputId = getInputId(propertyName)
+  .col
+      .m-3
+        label(
+          for= inputId
+        )= t(`views.tasks.${propertyName}`)
+        select(
+          id= inputId
+          name=itemType
+          class=classLine
+        )&attributes(attributes) 
+          option()
+          each item in items
+            option(value=item.id selected=(isSelectedFilter(item, queryParams, itemType) ? 'selected' : false))= item.name || `${item.firstName} ${item.lastName}`

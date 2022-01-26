@@ -141,6 +141,9 @@ module.exports = {
         executorId: 'Исполнитель',
         createdAt: 'Дата создания',
         labels: 'Метки',
+        label: 'Метка',
+        isCreatorUser: 'Только мои задачи',
+        show: 'Показать',
         new: {
           create: 'Создать задачу',
           creating: 'Создание задачи',

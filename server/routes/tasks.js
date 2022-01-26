@@ -5,10 +5,53 @@ import i18next from 'i18next';
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
-      const tasks = await app.objection.models.task.query().withGraphJoined('[creator, executor, status]');
+      try {
+        const tasks = await app.objection.models.task.query().withGraphJoined('[creator, executor, status, labels]');
+        const statuses = await app.objection.models.status.query();
+        const users = await app.objection.models.user.query();
+        const labels = await app.objection.models.label.query();
 
-      reply.render('tasks/index', { tasks });
-      return reply;
+        const userId = req.user.id;
+
+        const queryParams = Object.entries(req.query)
+          .filter(([, value]) => value)
+          .map(([param, value]) => {
+            if (!Number(value)) {
+              return ['creator', userId];
+            }
+            return [param, Number(value)];
+          });
+
+        const objectQueryParams = Object.fromEntries(queryParams);
+        const {
+          status, executor, label, creator,
+        } = objectQueryParams;
+
+        let filteredTasks = tasks;
+        if (status) {
+          filteredTasks = filteredTasks.filter((task) => task.status.id === status);
+        }
+        if (executor) {
+          filteredTasks = filteredTasks.filter((task) => task.executor.id === executor);
+        }
+        if (creator) {
+          filteredTasks = filteredTasks.filter((task) => task.creator.id === creator);
+        }
+        if (label) {
+          filteredTasks = filteredTasks.filter((task) => task.labels
+            .flat()
+            .map((labelItem) => Object.entries(labelItem))
+            .flat(2).includes(label));
+        }
+
+        reply.render('tasks/index', {
+          filteredTasks, statuses, users, labels, objectQueryParams,
+        });
+        return reply;
+      } catch (error) {
+        reply.send(error);
+        return reply;
+      }
     })
     .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
       const statuses = await app.objection.models.status.query();

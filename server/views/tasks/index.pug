@@ -1,7 +1,18 @@
 extends ../layouts/application2.pug
 
 block content
-  a(href=route('newTask'))= t('views.tasks.new.create')
+  a(class='nav-link' href=route('newTask'))= t('views.tasks.new.create')
+  .card-body.p-2.bg-light
+    +formFor()(action=route('tasks') method='get')
+      .row
+        +filterSelect(statuses, 'statusId', 'status', objectQueryParams)
+        +filterSelect(users, 'executorId', 'executor', objectQueryParams)
+        +filterSelect(labels, 'label', 'label', objectQueryParams)
+              
+      .mb-3.form-check
+        +checkbox('isCreatorUser', objectQueryParams)
+      +submit()(value= t('views.tasks.show'))
+      
   table.table.table-striped
     thead
       tr
@@ -13,7 +24,7 @@ block content
         th= t('views.tasks.createdAt')
         th
     tbody
-      each task in tasks
+      each task in filteredTasks
         tr
           td= task.id
           td
