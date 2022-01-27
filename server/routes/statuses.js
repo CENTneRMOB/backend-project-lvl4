@@ -34,7 +34,8 @@ export default (app) => {
         return reply;
       } catch (error) {
         req.flash('error', i18next.t('flash.statuses.create.error'));
-        reply.render('statuses/new', { status: req.body.data, errors: error.data });
+        // reply.render('statuses/new', { status: req.body.data, errors: error.data });
+        reply.send(error);
         return reply;
       }
     })
