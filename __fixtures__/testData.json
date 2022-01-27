@@ -21,6 +21,12 @@
     "deleting": {
       "email": "lawrence.kulas95@outlook.com",
       "password": "O6AvLIQL1cbzrre"
+    },
+    "newWithError": {
+      "firstName": "Mary",
+      "lastName": "Spielberg", 
+      "email": "",
+      "password": "RLJvaIgPOnX5r03"
     }
   },
   "statuses": {
@@ -35,6 +41,12 @@
     },
     "deleting": {
       "name": "thirdStatus"
+    },
+    "newWithError": {
+      "name": ""
+    },
+    "updatingWithError": {
+      "name": ""
     }
   },
   "tasks": {

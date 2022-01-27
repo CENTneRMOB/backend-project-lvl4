@@ -28,95 +28,196 @@ describe('test statuses CRUD', () => {
     cookies = await signIn(app, user);
   });
 
-  it('index', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('statuses'),
-      cookies,
+  describe('positive cases', () => {
+    it('index', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('statuses'),
+        cookies,
+      });
+      expect(response.statusCode).toBe(200);
     });
-    expect(response.statusCode).toBe(200);
+
+    it('new', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('newStatus'),
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(200);
+    });
+
+    it('create', async () => {
+      const newStatus = testData.statuses.new;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('postStatus'),
+        payload: {
+          data: newStatus,
+        },
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const expected = newStatus;
+      const status = await models.status.query().findOne({ name: newStatus.name });
+
+      expect(status).toMatchObject(expected);
+    });
+
+    it('edit', async () => {
+      const params = testData.statuses.existing;
+      const status = await models.status.query().findOne({ name: params.name });
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('editStatus', { id: status.id }),
+        payload: {
+          data: params,
+        },
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(200);
+    });
+
+    it('update', async () => {
+      const newParams = testData.statuses.updating; // updateStatus
+      const params = testData.statuses.existing; // firstStatus
+      const oldStatus = await models.status.query().findOne({ name: params.name });
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('patchStatus', { id: oldStatus.id }),
+        payload: {
+          data: newParams,
+        },
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const newStatus = await models.status.query().findById(oldStatus.id);
+      const expected = newParams;
+
+      expect(newStatus).toMatchObject(expected);
+    });
+
+    it('delete', async () => {
+      const params = testData.statuses.deleting;
+      const existStatus = await models.status.query().findOne({ name: params.name });
+
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('deleteStatus', { id: existStatus.id }),
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const expected = await models.status.query().findById(existStatus.id);
+
+      expect(expected).toBeUndefined();
+    });
   });
 
-  it('new', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('newStatus'),
-      cookies,
+  describe('error cases', () => {
+    it('auth errors', async () => {
+      const params = testData.statuses.existing;
+      const status = await models.status.query().findOne({ name: params.name });
+
+      const indexResponse = await app.inject({
+        method: 'GET',
+        url: app.reverse('statuses'),
+      });
+      expect(indexResponse.statusCode).toBe(302);
+
+      const newResponse = await app.inject({
+        method: 'GET',
+        url: app.reverse('newStatus'),
+      });
+      expect(newResponse.statusCode).toBe(302);
+
+      const createResponse = await app.inject({
+        method: 'POST',
+        url: app.reverse('postStatus'),
+      });
+      expect(createResponse.statusCode).toBe(302);
+
+      const editResponse = await app.inject({
+        method: 'GET',
+        url: app.reverse('editStatus', { id: status.id }),
+      });
+      expect(editResponse.statusCode).toBe(302);
+
+      const updateResponse = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('patchStatus', { id: status.id }),
+      });
+      expect(updateResponse.statusCode).toBe(302);
+
+      const deleteResponse = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('deleteStatus', { id: status.id }),
+      });
+      expect(deleteResponse.statusCode).toBe(302);
     });
 
-    expect(response.statusCode).toBe(200);
-  });
+    it('create', async () => {
+      const newStatus = testData.statuses.newWithError;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('postStatus'),
+        payload: {
+          data: newStatus,
+        },
+        cookies,
+      });
 
-  it('create', async () => {
-    const newStatus = testData.statuses.new;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('postStatus'),
-      payload: {
-        data: newStatus,
-      },
-      cookies,
+      expect(response.statusCode).toBe(200);
+
+      const status = await models.status.query().findOne({ name: newStatus.name });
+
+      expect(status).toBeUndefined();
     });
 
-    expect(response.statusCode).toBe(302);
+    it('update', async () => {
+      const newParams = testData.statuses.updatingWithError;
+      const params = testData.statuses.existing;
+      const oldStatus = await models.status.query().findOne({ name: params.name });
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('patchStatus', { id: oldStatus.id }),
+        payload: {
+          data: newParams,
+        },
+        cookies,
+      });
 
-    const expected = newStatus;
-    const status = await models.status.query().findOne({ name: newStatus.name });
+      expect(response.statusCode).toBe(200);
 
-    expect(status).toMatchObject(expected);
-  });
+      const newStatus = await models.status.query().findById(oldStatus.id);
+      const expected = newParams;
 
-  it('edit', async () => {
-    const params = testData.statuses.existing;
-    const status = await models.status.query().findOne({ name: params.name });
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('editStatus', { id: status.id }),
-      payload: {
-        data: params,
-      },
-      cookies,
+      expect(newStatus).not.toMatchObject(expected);
     });
 
-    expect(response.statusCode).toBe(200);
-  });
+    it('delete status on task', async () => {
+      const params = testData.statuses.existing;
+      const existStatus = await models.status.query().findOne({ name: params.name });
 
-  it('update', async () => {
-    const newParams = testData.statuses.updating; // updateStatus
-    const params = testData.statuses.existing; // firstStatus
-    const oldStatus = await models.status.query().findOne({ name: params.name });
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('patchStatus', { id: oldStatus.id }),
-      payload: {
-        data: newParams,
-      },
-      cookies,
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('deleteStatus', { id: existStatus.id }),
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const expected = await models.status.query().findById(existStatus.id);
+
+      expect(expected).toMatchObject(params);
     });
-
-    expect(response.statusCode).toBe(302);
-
-    const newStatus = await models.status.query().findById(oldStatus.id);
-    const expected = newParams;
-
-    expect(newStatus).toMatchObject(expected);
-  });
-
-  it('delete', async () => {
-    const params = testData.statuses.deleting; // thirdStatus
-    const existStatus = await models.status.query().findOne({ name: params.name });
-
-    const response = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('deleteStatus', { id: existStatus.id }),
-      cookies,
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const expected = await models.status.query().findById(existStatus.id);
-
-    expect(expected).toBeUndefined();
   });
 
   afterEach(async () => {
