@@ -1,13 +1,21 @@
 // @ts-check
 
 import i18next from 'i18next';
+// import Rollbar from 'rollbar';
 
 export default (app) => {
   app
     .get('/labels', { name: 'labels', preValidation: app.authenticate }, async (req, reply) => {
-      const labels = await app.objection.models.label.query();
-      reply.render('labels/index', { labels });
-      return reply;
+      try {
+        throw new Error('hi there');
+        // const labels = await app.objection.models.label.query();
+        // reply.render('labels/index', { labels });
+        // return reply;
+      } catch (error) {
+        app.logger(error.message);
+        reply.send(error);
+        return reply;
+      }
     })
     .get('/labels/new', { name: 'newLabel', preValidation: app.authenticate }, async (req, reply) => {
       const label = new app.objection.models.label();
