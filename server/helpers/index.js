@@ -3,8 +3,6 @@
 import i18next from 'i18next';
 import _ from 'lodash';
 
-const Rollbar = require('rollbar');
-
 export default (app) => ({
   route(name, obj = {}) {
     return app.reverse(name, obj);
@@ -30,14 +28,5 @@ export default (app) => ({
   formatDate(str) {
     const date = new Date(str);
     return date.toLocaleString();
-  },
-  logger(message) {
-    const rollbar = new Rollbar({
-      accessToken: process.env.ROLLBAR_KEY,
-      captureUncaught: true,
-      captureUnhandledRejections: true,
-    });
-
-    rollbar.log(message);
   },
 });

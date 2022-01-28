@@ -1,7 +1,13 @@
 // @ts-check
 
 import i18next from 'i18next';
-// import Rollbar from 'rollbar';
+import Rollbar from 'rollbar';
+
+const rollbar = new Rollbar({
+  accessToken: process.env.ROLLBAR_KEY,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
 
 export default (app) => {
   app
@@ -12,7 +18,7 @@ export default (app) => {
         // reply.render('labels/index', { labels });
         // return reply;
       } catch (error) {
-        app.logger(error.message);
+        rollbar.log(error.message);
         reply.send(error);
         return reply;
       }
