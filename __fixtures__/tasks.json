@@ -16,5 +16,13 @@
     "description": "task3 description",
     "statusId": 1,
     "creatorId": 2
+  },
+  {
+    "name": "fullTask",
+    "description": "fullTask description",
+    "statusId": 1,
+    "creatorId": 2,
+    "executorId": 1,
+    "labelsId": [4, 5]
   }
 ]

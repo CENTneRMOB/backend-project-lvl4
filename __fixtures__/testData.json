@@ -66,6 +66,17 @@
     },
     "deleting": {
       "name": "task3"
+    },
+    "newWithError": {
+      "name": "newTaskwithError",
+      "description": "new task description",
+      "statusId": "",
+      "executorId": 2
+    },
+    "updatingWithError": {
+      "name": "",
+      "description": "update description for task",
+      "executorId": 3
     }
   },
   "labels": {
@@ -80,6 +91,15 @@
     },
     "deleting": {
       "name": "thirdLabel"
+    },
+    "newWithError": {
+      "name": ""
+    },
+    "updatingWithError": {
+      "name": ""
+    },
+    "labelFromTask": {
+      "name": "taskLabel"
     }
   }
 }

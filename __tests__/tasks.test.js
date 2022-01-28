@@ -28,96 +28,219 @@ describe('test tasks CRUD', () => {
     cookies = await signIn(app, user);
   });
 
-  it('index', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('tasks'),
-      cookies,
+  describe('positive cases', () => {
+    it('index', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('tasks'),
+        cookies,
+      });
+      expect(response.statusCode).toBe(200);
     });
-    expect(response.statusCode).toBe(200);
+
+    it('index filtered', async () => {
+      const query = {
+        status: 1,
+        executor: null,
+        label: 4,
+        isCreatorUser: 'on',
+      };
+
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('tasks'),
+        cookies,
+        query,
+      });
+
+      // console.log(response);
+      expect(response.statusCode).toBe(200);
+    });
+
+    it('new', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('newTask'),
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(200);
+    });
+
+    it('create', async () => {
+      const newTask = testData.tasks.new;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('postTask'),
+        payload: {
+          data: newTask,
+        },
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const expected = newTask;
+      const task = await models.task.query().findOne({ name: newTask.name });
+
+      expect(task).toMatchObject(expected);
+    });
+
+    it('edit', async () => {
+      const params = testData.tasks.existing;
+      const task = await models.task.query().findOne({ name: params.name });
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('editTask', { id: task.id }),
+        payload: {
+          data: params,
+        },
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(200);
+    });
+
+    it('update', async () => {
+      const newParams = testData.tasks.updating;
+      const params = testData.tasks.existing;
+      const oldTask = await models.task.query().findOne({ name: params.name });
+      const data = Object.assign(oldTask, newParams);
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('patchTask', { id: oldTask.id }),
+        payload: {
+          data,
+        },
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const newTask = await models.task.query().findById(oldTask.id);
+      const expected = newParams;
+
+      expect(newTask).toMatchObject(expected);
+    });
+
+    it('delete', async () => {
+      const params = testData.tasks.deleting;
+      const existTask = await models.task.query().findOne({ name: params.name });
+
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('deleteTask', { id: existTask.id }),
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const expected = await models.task.query().findById(existTask.id);
+
+      expect(expected).toBeUndefined();
+    });
   });
 
-  it('new', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('newTask'),
-      cookies,
+  describe('error cases', () => {
+    it('auth errors', async () => {
+      const params = testData.tasks.existing;
+      const task = await models.task.query().findOne({ name: params.name });
+
+      const indexResponse = await app.inject({
+        method: 'GET',
+        url: app.reverse('tasks'),
+      });
+      expect(indexResponse.statusCode).toBe(302);
+
+      const newResponse = await app.inject({
+        method: 'GET',
+        url: app.reverse('newTask'),
+      });
+      expect(newResponse.statusCode).toBe(302);
+
+      const createResponse = await app.inject({
+        method: 'POST',
+        url: app.reverse('postTask'),
+      });
+      expect(createResponse.statusCode).toBe(302);
+
+      const editResponse = await app.inject({
+        method: 'GET',
+        url: app.reverse('editTask', { id: task.id }),
+      });
+      expect(editResponse.statusCode).toBe(302);
+
+      const updateResponse = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('patchTask', { id: task.id }),
+      });
+      expect(updateResponse.statusCode).toBe(302);
+
+      const deleteResponse = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('deleteTask', { id: task.id }),
+      });
+      expect(deleteResponse.statusCode).toBe(302);
     });
 
-    expect(response.statusCode).toBe(200);
-  });
+    it('create', async () => {
+      const newTask = testData.tasks.newWithError;
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('postTask'),
+        payload: {
+          data: newTask,
+        },
+        cookies,
+      });
 
-  it('create', async () => {
-    const newTask = testData.tasks.new;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('postTask'),
-      payload: {
-        data: newTask,
-      },
-      cookies,
+      expect(response.statusCode).toBe(200);
+
+      const task = await models.task.query().findOne({ name: newTask.name });
+
+      expect(task).toBeUndefined();
     });
 
-    expect(response.statusCode).toBe(302);
+    it('update', async () => {
+      const newParams = testData.tasks.updatingWithError;
+      const params = testData.tasks.existing;
+      const oldTask = await models.task.query().findOne({ name: params.name });
+      const data = Object.assign(oldTask, newParams);
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('patchTask', { id: oldTask.id }),
+        payload: {
+          data,
+        },
+        cookies,
+      });
 
-    const expected = newTask;
-    const task = await models.task.query().findOne({ name: newTask.name });
+      expect(response.statusCode).toBe(200);
 
-    expect(task).toMatchObject(expected);
-  });
+      const newTask = await models.task.query().findById(oldTask.id);
+      const expected = newParams;
 
-  it('edit', async () => {
-    const params = testData.tasks.existing;
-    const task = await models.task.query().findOne({ name: params.name });
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('editTask', { id: task.id }),
-      payload: {
-        data: params,
-      },
-      cookies,
+      expect(newTask).not.toMatchObject(expected);
     });
 
-    expect(response.statusCode).toBe(200);
-  });
+    it('delete task by another user instead of creator', async () => {
+      const task = testData.tasks.existing; // creator id 1
+      const remover = testData.users.existing; // id 2
+      const newCookies = await signIn(app, remover);
+      const existTask = await models.task.query().findOne({ name: task.name });
 
-  it('update', async () => {
-    const newParams = testData.tasks.updating;
-    const params = testData.tasks.existing;
-    const oldTask = await models.task.query().findOne({ name: params.name });
-    const data = Object.assign(oldTask, newParams);
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('patchTask', { id: oldTask.id }),
-      payload: {
-        data,
-      },
-      cookies,
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('deleteUser', { id: existTask.id }),
+        cookies: newCookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const expected = await models.task.query().findById(existTask.id);
+
+      expect(expected).toMatchObject(existTask);
     });
-
-    expect(response.statusCode).toBe(302);
-
-    const newTask = await models.task.query().findById(oldTask.id);
-    const expected = newParams;
-
-    expect(newTask).toMatchObject(expected);
-  });
-
-  it('delete', async () => {
-    const params = testData.tasks.deleting;
-    const existTask = await models.task.query().findOne({ name: params.name });
-
-    const response = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('deleteTask', { id: existTask.id }),
-      cookies,
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const expected = await models.task.query().findById(existTask.id);
-
-    expect(expected).toBeUndefined();
   });
 
   afterEach(async () => {

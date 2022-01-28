@@ -65,10 +65,8 @@ export default (app) => {
       }
       try {
         await app.objection.models.label.query().deleteById(id);
-        // const labels = await app.objection.models.label.query();
         req.flash('info', i18next.t('flash.labels.delete.success'));
         reply.redirect('/labels');
-        // reply.send(labels);
         return reply;
       } catch (error) {
         reply.send(error);

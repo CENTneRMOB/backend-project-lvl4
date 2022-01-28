@@ -29,19 +29,23 @@ export default (app) => {
 
         let filteredTasks = tasks;
         if (status) {
-          filteredTasks = filteredTasks.filter((task) => task.status.id === status);
+          filteredTasks = filteredTasks
+            .filter((task) => task.status.id === status);
         }
         if (executor) {
-          filteredTasks = filteredTasks.filter((task) => task.executor.id === executor);
+          filteredTasks = filteredTasks
+            .filter((task) => task.executor && task.executor.id === executor);
         }
         if (creator) {
-          filteredTasks = filteredTasks.filter((task) => task.creator.id === creator);
+          filteredTasks = filteredTasks
+            .filter((task) => task.creator.id === creator);
         }
         if (label) {
-          filteredTasks = filteredTasks.filter((task) => task.labels
-            .flat()
-            .map((labelItem) => Object.entries(labelItem))
-            .flat(2).includes(label));
+          filteredTasks = filteredTasks
+            .filter((task) => task.labels
+              .flat()
+              .map((labelItem) => Object.entries(labelItem))
+              .flat(2).includes(label));
         }
 
         reply.render('tasks/index', {
@@ -49,6 +53,7 @@ export default (app) => {
         });
         return reply;
       } catch (error) {
+        console.log('ERRRRRORROROROROR: ', error);
         reply.send(error);
         return reply;
       }

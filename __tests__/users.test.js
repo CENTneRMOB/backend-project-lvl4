@@ -171,7 +171,7 @@ describe('test users CRUD', () => {
       expect(response.statusCode).toBe(200);
     });
 
-    it('delete by another user', async () => {
+    it('delete user by another user', async () => {
       const user = testData.users.deleting;
       const remover = testData.users.existing;
       const cookies = await signIn(app, remover);
