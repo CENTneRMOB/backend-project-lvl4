@@ -99,7 +99,7 @@ describe('test labels CRUD', () => {
 
       const newLabel = await models.label.query().findById(oldLabel.id);
       const expected = newParams;
-  
+
       expect(newLabel).toMatchObject(expected);
     });
 
