@@ -142,10 +142,10 @@ export default (app) => {
         const labels = await app.objection.models.label.query();
 
         req.flash('error', i18next.t('flash.tasks.create.error'));
-        // reply.render('tasks/new', {
-        //   task: req.body.data, statuses, users, labels, errors: error.data,
-        // });
-        reply.send(error);
+        reply.render('tasks/new', {
+          task: req.body.data, statuses, users, labels, errors: error.data,
+        });
+        // reply.send(error);
         return reply;
       }
     })
