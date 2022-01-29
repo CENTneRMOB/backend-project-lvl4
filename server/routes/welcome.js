@@ -3,7 +3,7 @@
 export default (app) => {
   app
     // .get('/', { name: 'root' }, (req, reply) => {
-    //   reply.render('layouts/application2');
+    //   reply.render('layouts/application');
     // })
     .get('/', { name: 'root' }, (req, reply) => {
       reply.render('welcome/index');
