@@ -86,7 +86,7 @@ const addHooks = (app) => {
 };
 
 const rollbar = new Rollbar({
-  accessToken: 'afc805113e77447199e0d6e48bb70aef',
+  accessToken: process.env.ROLLBAR_TOKEN,
   captureUncaught: true,
   captureUnhandledRejections: true,
 });
