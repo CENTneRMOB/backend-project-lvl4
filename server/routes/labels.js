@@ -1,24 +1,15 @@
 // @ts-check
 
 import i18next from 'i18next';
-import Rollbar from 'rollbar';
-
-const rollbar = new Rollbar({
-  accessToken: process.env.ROLLBAR_KEY,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
 
 export default (app) => {
   app
     .get('/labels', { name: 'labels', preValidation: app.authenticate }, async (req, reply) => {
       try {
-        throw new Error('hi there');
-        // const labels = await app.objection.models.label.query();
-        // reply.render('labels/index', { labels });
-        // return reply;
+        const labels = await app.objection.models.label.query();
+        reply.render('labels/index', { labels });
+        return reply;
       } catch (error) {
-        rollbar.log(error.message);
         reply.send(error);
         return reply;
       }

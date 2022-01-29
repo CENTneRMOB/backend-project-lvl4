@@ -17,6 +17,7 @@ import fastifyObjectionjs from 'fastify-objectionjs';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
+import Rollbar from 'rollbar';
 import ru from './locales/ru.js';
 // @ts-ignore
 import webpackConfig from '../webpack.config.babel.js';
@@ -26,6 +27,7 @@ import getHelpers from './helpers/index.js';
 import knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
+import { appendFile } from 'fs';
 
 dotenv.config();
 const mode = process.env.NODE_ENV || 'development';
@@ -84,7 +86,17 @@ const addHooks = (app) => {
   });
 };
 
+const rollbar = new Rollbar({
+  accessToken: process.env.POST_SERVER_ITEM_ACCESS_TOKEN,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+
 const registerPlugins = (app) => {
+  app.setErrorHandler((error, req, reply) => {
+    rollbar.log(error);
+    reply.redirect('/');
+  });
   app.register(fastifySensible);
   app.register(fastifyErrorPage);
   app.register(fastifyReverseRoutes);
