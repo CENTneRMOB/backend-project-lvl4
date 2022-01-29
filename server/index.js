@@ -27,7 +27,6 @@ import getHelpers from './helpers/index.js';
 import knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
-import { appendFile } from 'fs';
 
 dotenv.config();
 const mode = process.env.NODE_ENV || 'development';
