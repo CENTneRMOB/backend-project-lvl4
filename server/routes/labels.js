@@ -5,15 +5,14 @@ import i18next from 'i18next';
 export default (app) => {
   app
     .get('/labels', { name: 'labels', preValidation: app.authenticate }, async (req, reply) => {
-      // try {
-      //   const labels = await app.objection.models.label.query();
-      //   reply.render('labels/index', { labels });
-      //   return reply;
-      // } catch (error) {
-      //   reply.send(error);
-      //   return reply;
-      // }
-      throw new Error('error message');
+      try {
+        const labels = await app.objection.models.label.query();
+        reply.render('labels/index', { labels });
+        return reply;
+      } catch (error) {
+        reply.send(error);
+        return reply;
+      }
     })
     .get('/labels/new', { name: 'newLabel', preValidation: app.authenticate }, async (req, reply) => {
       const label = new app.objection.models.label();
