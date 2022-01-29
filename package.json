@@ -1,7 +1,7 @@
 {
-   "name": "fastify-nodejs-application",
+   "name": "@hexlet/code",
    "version": "0.1.0",
-   "description": "fastify-nodejs-application",
+   "description": "Fastify-nodejs task manager application",
    "main": "server/index.js",
    "scripts": {
       "test": "jest",
