@@ -2,7 +2,7 @@
 
 exports.up = (knex) => (
   knex.schema.table('tasks', (table) => {
-    table.specificType('labels_id', 'int[]').references('id').inTable('labels');
+    table.integer('labels_id').references('id').inTable('labels');
   })
 );
 
