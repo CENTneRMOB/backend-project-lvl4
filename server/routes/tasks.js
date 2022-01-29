@@ -108,7 +108,7 @@ export default (app) => {
         } else {
           labelsData = !labels ? '' : labels.join(',');
         }
-        // console.log('LABELS: ', labels, typeof labels, Array.isArray(labels));
+        console.log('LABELS: ', labels, typeof labels, Array.isArray(labels), 'LABELSDATA: ', labelsData, typeof labelsData);
 
         const dataObj = {
           name,
@@ -118,20 +118,17 @@ export default (app) => {
           creatorId: req.user.id,
           labelsId: labelsData,
         };
-        // console.log('LABELSDATA:', labelsData, 'LABELS: ', labels, dataObj);
 
         const task = await app.objection.models.task.fromJson(dataObj);
         await app.objection.models.task.query().insert(task);
 
-        // console.log('TASK LABELID', task.labelsId, typeof task.labelsId);
+        const labelsArray = labelsData.split(',');
 
-        if (task.labelsId) {
-          task.labelsId.split(',')
-            .map((labelId) => ({ taskId: task.id, labelId: Number(labelId) }))
-            .forEach(async (item) => {
-              await app.objection.models.tasklabel.query().insert(item);
-            });
-        }
+        labelsArray.forEach(async (labelId) => {
+          const object = { taskId: task.id, labelId: Number(labelId) };
+
+          await app.objection.models.tasklabel.query().insert(object);
+        });
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
@@ -159,7 +156,6 @@ export default (app) => {
           labels,
         } = req.body.data;
 
-        // console.log('!!!!!!!!LABELS: ', labels, typeof labels);
         let labelsData;
         if (typeof labels === 'string') {
           labelsData = labels.length === 0 ? '' : labels;
@@ -180,11 +176,13 @@ export default (app) => {
         const task = await app.objection.models.task.query().findById(id).withGraphJoined('labels');
         await app.objection.models.tasklabel.query().delete().where('task_id', '=', task.id);
 
-        labelsData.split(',')
-          .map((labelId) => ({ taskId: Number(id), labelId: Number(labelId) }))
-          .forEach(async (item) => {
-            await app.objection.models.tasklabel.query().insert(item);
-          });
+        const labelsArray = labelsData.split(',');
+
+        labelsArray.forEach(async (labelId) => {
+          const object = { taskId: Number(id), labelId: Number(labelId) };
+
+          await app.objection.models.tasklabel.query().insert(object);
+        });
 
         await task.$query().patch(dataObj);
         req.flash('info', i18next.t('flash.tasks.edit.success'));
