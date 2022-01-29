@@ -71,6 +71,7 @@ export default (app) => {
     .get('/tasks/:id', { name: 'viewTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status, labels]');
+      console.log(task);
       reply.render('tasks/view', { task });
       return reply;
     })
@@ -103,10 +104,11 @@ export default (app) => {
         let labelsData;
 
         if (typeof labels === 'string') {
-          labelsData = [Number(labels)];
+          labelsData = labels;
         } else {
-          labelsData = !labels ? [] : labels.map((labelId) => Number(labelId));
+          labelsData = !labels ? '' : labels.join(',');
         }
+        // console.log('LABELS: ', labels, typeof labels, Array.isArray(labels));
 
         const dataObj = {
           name,
@@ -116,15 +118,20 @@ export default (app) => {
           creatorId: req.user.id,
           labelsId: labelsData,
         };
+        // console.log('LABELSDATA:', labelsData, 'LABELS: ', labels, dataObj);
 
         const task = await app.objection.models.task.fromJson(dataObj);
         await app.objection.models.task.query().insert(task);
 
-        task.labelsId
-          .map((labelId) => ({ taskId: task.id, labelId }))
-          .forEach(async (item) => {
-            await app.objection.models.tasklabel.query().insert(item);
-          });
+        // console.log('TASK LABELID', task.labelsId, typeof task.labelsId);
+
+        if (task.labelsId) {
+          task.labelsId.split(',')
+            .map((labelId) => ({ taskId: task.id, labelId: Number(labelId) }))
+            .forEach(async (item) => {
+              await app.objection.models.tasklabel.query().insert(item);
+            });
+        }
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
@@ -152,11 +159,12 @@ export default (app) => {
           labels,
         } = req.body.data;
 
+        // console.log('!!!!!!!!LABELS: ', labels, typeof labels);
         let labelsData;
         if (typeof labels === 'string') {
-          labelsData = labels.length === 0 ? [] : [Number(labels)];
+          labelsData = labels.length === 0 ? '' : labels;
         } else {
-          labelsData = !labels ? [] : labels.map((labelId) => Number(labelId));
+          labelsData = !labels ? '' : labels.join(',');
         }
 
         const dataObj = {
@@ -172,8 +180,8 @@ export default (app) => {
         const task = await app.objection.models.task.query().findById(id).withGraphJoined('labels');
         await app.objection.models.tasklabel.query().delete().where('task_id', '=', task.id);
 
-        labelsData
-          .map((labelId) => ({ taskId: Number(id), labelId }))
+        labelsData.split(',')
+          .map((labelId) => ({ taskId: Number(id), labelId: Number(labelId) }))
           .forEach(async (item) => {
             await app.objection.models.tasklabel.query().insert(item);
           });
