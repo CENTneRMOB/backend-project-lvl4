@@ -71,6 +71,7 @@ export default (app) => {
       }
       if (req.user.id === Number(id)) {
         try {
+          req.logout();
           await app.objection.models.user.query().deleteById(id);
           req.flash('info', i18next.t('flash.users.delete.success'));
           reply.redirect(app.reverse('users'));
