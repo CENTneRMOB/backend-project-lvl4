@@ -53,7 +53,6 @@ export default (app) => {
         });
         return reply;
       } catch (error) {
-        console.log('ERRRRRORROROROROR: ', error);
         reply.send(error);
         return reply;
       }
@@ -71,7 +70,6 @@ export default (app) => {
     .get('/tasks/:id', { name: 'viewTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status, labels]');
-      console.log(task);
       reply.render('tasks/view', { task });
       return reply;
     })
@@ -108,7 +106,6 @@ export default (app) => {
         } else {
           labelsData = !labels ? '' : labels.join(',');
         }
-        console.log('LABELS: ', labels, typeof labels, Array.isArray(labels), 'LABELSDATA: ', labelsData, typeof labelsData);
 
         const dataObj = {
           name,
