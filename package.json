@@ -4,7 +4,7 @@
    "description": "Fastify-nodejs task manager application",
    "main": "server/index.js",
    "scripts": {
-      "test": "npx jest",
+      "test": "jest",
       "prebuild": "rm -rf dist",
       "build-configs": "babel webpack.config.babel.js --out-dir dist",
       "build-db": "cp knexfile.js dist && NODE_ENV=production knex migrate:latest",
