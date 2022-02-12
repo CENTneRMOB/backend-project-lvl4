@@ -108,7 +108,7 @@ mixin checkbox(name, queryParams = {})
 
 mixin filterSelect(items, propertyName, itemType, queryParams = {})
   - classLine = 'form-control ml-2 mr3'
-  - inputId = getInputId(propertyName)
+  - inputId = getInputId(itemType)
   .col
       .m-3
         label(
