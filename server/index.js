@@ -4,12 +4,12 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fastify from 'fastify';
 import fastifyStatic from 'fastify-static';
-import fastifyErrorPage from 'fastify-error-page';
+// import fastifyErrorPage from 'fastify-error-page';
 import pointOfView from 'point-of-view';
 import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
 import fastifyPassport from 'fastify-passport';
-import fastifySensible from 'fastify-sensible';
+// import fastifySensible from 'fastify-sensible';
 // import fastifyFlash from 'fastify-flash';
 import { plugin as fastifyReverseRoutes } from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
@@ -92,12 +92,8 @@ const rollbar = new Rollbar({
 });
 
 const registerPlugins = (app) => {
-  app.setErrorHandler((error, req, reply) => {
-    rollbar.log(error);
-    reply.redirect('/');
-  });
-  app.register(fastifySensible);
-  app.register(fastifyErrorPage);
+  // app.register(fastifySensible);
+  // app.register(fastifyErrorPage);
   app.register(fastifyReverseRoutes);
   app.register(fastifyFormbody, { parser: qs.parse });
   app.register(fastifySecureSession, {
@@ -145,6 +141,11 @@ export default () => {
   setUpStaticAssets(app);
   addRoutes(app);
   addHooks(app);
+
+  app.setErrorHandler((error, req, reply) => {
+    rollbar.log(error.message);
+    reply.redirect('/');
+  });
 
   return app;
 };
