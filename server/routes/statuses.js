@@ -34,7 +34,7 @@ export default (app) => {
         return reply;
       } catch (error) {
         req.flash('error', i18next.t('flash.statuses.create.error'));
-        reply.render('statuses/new', { status: req.body.data, errors: error.data });
+        reply.code(422).render('statuses/new', { status: req.body.data, errors: error.data });
         return reply;
       }
     })
@@ -51,7 +51,7 @@ export default (app) => {
         return reply;
       } catch (error) {
         req.flash('error', i18next.t('flash.statuses.edit.error'));
-        reply.render('statuses/edit', { status, errors: error.data });
+        reply.code(422).render('statuses/edit', { status, errors: error.data });
         return reply;
       }
     })

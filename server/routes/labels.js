@@ -39,7 +39,7 @@ export default (app) => {
         return reply;
       } catch (error) {
         req.flash('error', i18next.t('flash.labels.create.error'));
-        reply.render('labels/new', { label: req.body.data, errors: error.data });
+        reply.code(422).render('labels/new', { label: req.body.data, errors: error.data });
         return reply;
       }
     })
@@ -56,7 +56,7 @@ export default (app) => {
         return reply;
       } catch (error) {
         req.flash('error', i18next.t('flash.labels.edit.error'));
-        reply.render('labels/edit', { label, errors: error.data });
+        reply.code(422).render('labels/edit', { label, errors: error.data });
         return reply;
       }
     })

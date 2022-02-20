@@ -136,7 +136,7 @@ export default (app) => {
         const labels = await app.objection.models.label.query();
 
         req.flash('error', i18next.t('flash.tasks.create.error'));
-        reply.render('tasks/new', {
+        reply.code(422).render('tasks/new', {
           task: req.body.data, statuses, users, labels, errors: error.data,
         });
         // reply.send(error);
@@ -191,7 +191,7 @@ export default (app) => {
         const labels = await app.objection.models.label.query();
 
         req.flash('error', i18next.t('flash.tasks.edit.error'));
-        reply.render('tasks/edit', {
+        reply.code(422).render('tasks/edit', {
           task: req.body.data, statuses, users, labels, errors: error.data,
         });
         // reply.send(error);

@@ -1,6 +1,5 @@
 // @ts-check
 
-// import _ from 'lodash';
 import getApp from '../server/index.js';
 import { getTestData, prepareData, signIn } from './helpers/index.js';
 
@@ -10,6 +9,8 @@ describe('test tasks CRUD', () => {
   let models;
   let user;
   let cookies;
+  let taskParams;
+  let taskId;
   const testData = getTestData();
 
   beforeAll(async () => {
@@ -17,6 +18,7 @@ describe('test tasks CRUD', () => {
     knex = app.objection.knex;
     models = app.objection.models;
     user = testData.users.existing;
+    taskParams = testData.tasks.existing;
   });
 
   beforeEach(async () => {
@@ -26,6 +28,8 @@ describe('test tasks CRUD', () => {
     await knex.migrate.latest();
     await prepareData(app);
     cookies = await signIn(app, user);
+    const existingTask = await models.task.query().findOne({ name: taskParams.name });
+    taskId = existingTask.id;
   });
 
   describe('positive cases', () => {
@@ -38,10 +42,44 @@ describe('test tasks CRUD', () => {
       expect(response.statusCode).toBe(200);
     });
 
-    it('index filtered', async () => {
-      const query = {
+    const query = {
+      status: '',
+      executor: '',
+      label: '',
+      isCreatorUser: '',
+    };
+
+    const queryParams = [
+      ['status', 1, 3],
+      ['executor', 1, 1],
+      ['label', 4, 1],
+      ['isCreatorUser', 'on', 2],
+    ];
+
+    it.each(queryParams)('filtered by %s case', async (key, value, tasksLength) => {
+      const caseQueryParams = { ...query, [key]: value };
+
+      const response = await app.inject({
+        method: 'GET',
+        url: app.reverse('tasks'),
+        cookies,
+        query: caseQueryParams,
+      });
+
+      expect(response.statusCode).toBe(200);
+
+      const startOfTable = response.body.indexOf('tbody');
+      const endOfTable = response.body.lastIndexOf('tbody');
+      const slicedBody = response.body.slice(startOfTable, endOfTable);
+      const counts = slicedBody.match(/Изменить/gm);
+
+      expect(counts.length).toBe(tasksLength);
+    });
+
+    it('index full filtered case', async () => {
+      const fullQuery = {
         status: 1,
-        executor: null,
+        executor: 1,
         label: 4,
         isCreatorUser: 'on',
       };
@@ -50,11 +88,17 @@ describe('test tasks CRUD', () => {
         method: 'GET',
         url: app.reverse('tasks'),
         cookies,
-        query,
+        query: fullQuery,
       });
 
-      // console.log(response);
       expect(response.statusCode).toBe(200);
+
+      const startOfTable = response.body.indexOf('tbody');
+      const endOfTable = response.body.lastIndexOf('tbody');
+      const slicedBody = response.body.slice(startOfTable, endOfTable);
+      const counts = slicedBody.match(/Изменить/gm);
+
+      expect(counts.length).toBe(1);
     });
 
     it('new', async () => {
@@ -80,10 +124,9 @@ describe('test tasks CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = newTask;
       const task = await models.task.query().findOne({ name: newTask.name });
 
-      expect(task).toMatchObject(expected);
+      expect(task).toMatchObject(newTask);
     });
 
     it('edit', async () => {
@@ -118,69 +161,49 @@ describe('test tasks CRUD', () => {
       expect(response.statusCode).toBe(302);
 
       const newTask = await models.task.query().findById(oldTask.id);
-      const expected = newParams;
 
-      expect(newTask).toMatchObject(expected);
+      expect(newTask).toMatchObject(newParams);
     });
 
     it('delete', async () => {
       const params = testData.tasks.deleting;
-      const existTask = await models.task.query().findOne({ name: params.name });
+      const existingTask = await models.task.query().findOne({ name: params.name });
 
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('deleteTask', { id: existTask.id }),
+        url: app.reverse('deleteTask', { id: existingTask.id }),
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.task.query().findById(existTask.id);
+      const expected = await models.task.query().findById(existingTask.id);
 
       expect(expected).toBeUndefined();
     });
   });
 
   describe('error cases', () => {
-    it('auth errors', async () => {
-      const params = testData.tasks.existing;
-      const task = await models.task.query().findOne({ name: params.name });
+    const routesWithData = [
+      ['tasks', 'GET', '', 302],
+      ['newTask', 'GET', '', 302],
+      ['postTask', 'POST', '', 302],
+      ['editTask', 'GET', taskId, 302],
+      ['patchTask', 'PATCH', taskId, 302],
+      ['deleteTask', 'DELETE', taskId, 302],
+    ];
 
-      const indexResponse = await app.inject({
-        method: 'GET',
-        url: app.reverse('tasks'),
+    it.each(routesWithData)('%s auth error case', async (route, method, data, expected) => {
+      const response = await app.inject({
+        method,
+        url: app.reverse(route, { id: `${data}` }),
       });
-      expect(indexResponse.statusCode).toBe(302);
 
-      const newResponse = await app.inject({
-        method: 'GET',
-        url: app.reverse('newTask'),
-      });
-      expect(newResponse.statusCode).toBe(302);
+      expect(response.statusCode).toBe(expected);
 
-      const createResponse = await app.inject({
-        method: 'POST',
-        url: app.reverse('postTask'),
-      });
-      expect(createResponse.statusCode).toBe(302);
+      const taskFromDB = await models.task.query().findById(taskId);
 
-      const editResponse = await app.inject({
-        method: 'GET',
-        url: app.reverse('editTask', { id: task.id }),
-      });
-      expect(editResponse.statusCode).toBe(302);
-
-      const updateResponse = await app.inject({
-        method: 'PATCH',
-        url: app.reverse('patchTask', { id: task.id }),
-      });
-      expect(updateResponse.statusCode).toBe(302);
-
-      const deleteResponse = await app.inject({
-        method: 'DELETE',
-        url: app.reverse('deleteTask', { id: task.id }),
-      });
-      expect(deleteResponse.statusCode).toBe(302);
+      expect(taskFromDB).toMatchObject(taskParams);
     });
 
     it('create', async () => {
@@ -194,7 +217,7 @@ describe('test tasks CRUD', () => {
         cookies,
       });
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(422);
 
       const task = await models.task.query().findOne({ name: newTask.name });
 
@@ -215,31 +238,30 @@ describe('test tasks CRUD', () => {
         cookies,
       });
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(422);
 
       const newTask = await models.task.query().findById(oldTask.id);
-      const expected = newParams;
 
-      expect(newTask).not.toMatchObject(expected);
+      expect(newTask).toMatchObject(params);
     });
 
     it('delete task by another user instead of creator', async () => {
-      const task = testData.tasks.existing; // creator id 1
-      const remover = testData.users.existing; // id 2
+      const task = testData.tasks.existing;
+      const remover = testData.users.existing;
       const newCookies = await signIn(app, remover);
-      const existTask = await models.task.query().findOne({ name: task.name });
+      const existingTask = await models.task.query().findOne({ name: task.name });
 
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('deleteUser', { id: existTask.id }),
+        url: app.reverse('deleteUser', { id: existingTask.id }),
         cookies: newCookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.task.query().findById(existTask.id);
+      const expected = await models.task.query().findById(existingTask.id);
 
-      expect(expected).toMatchObject(existTask);
+      expect(expected).toMatchObject(existingTask);
     });
   });
 

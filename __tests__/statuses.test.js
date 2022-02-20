@@ -1,6 +1,5 @@
 // @ts-check
 
-// import _ from 'lodash';
 import getApp from '../server/index.js';
 import { getTestData, prepareData, signIn } from './helpers/index.js';
 
@@ -10,6 +9,8 @@ describe('test statuses CRUD', () => {
   let models;
   let user;
   let cookies;
+  let statusParams;
+  let statusId;
   const testData = getTestData();
 
   beforeAll(async () => {
@@ -17,6 +18,7 @@ describe('test statuses CRUD', () => {
     knex = app.objection.knex;
     models = app.objection.models;
     user = testData.users.existing;
+    statusParams = testData.statuses.existing;
   });
 
   beforeEach(async () => {
@@ -26,6 +28,8 @@ describe('test statuses CRUD', () => {
     await knex.migrate.latest();
     await prepareData(app);
     cookies = await signIn(app, user);
+    const existingStatus = await models.status.query().findOne({ name: statusParams.name });
+    statusId = existingStatus.id;
   });
 
   describe('positive cases', () => {
@@ -35,6 +39,7 @@ describe('test statuses CRUD', () => {
         url: app.reverse('statuses'),
         cookies,
       });
+
       expect(response.statusCode).toBe(200);
     });
 
@@ -61,10 +66,9 @@ describe('test statuses CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = newStatus;
       const status = await models.status.query().findOne({ name: newStatus.name });
 
-      expect(status).toMatchObject(expected);
+      expect(status).toMatchObject(newStatus);
     });
 
     it('edit', async () => {
@@ -83,8 +87,8 @@ describe('test statuses CRUD', () => {
     });
 
     it('update', async () => {
-      const newParams = testData.statuses.updating; // updateStatus
-      const params = testData.statuses.existing; // firstStatus
+      const newParams = testData.statuses.updating;
+      const params = testData.statuses.existing;
       const oldStatus = await models.status.query().findOne({ name: params.name });
       const response = await app.inject({
         method: 'PATCH',
@@ -98,69 +102,49 @@ describe('test statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
 
       const newStatus = await models.status.query().findById(oldStatus.id);
-      const expected = newParams;
 
-      expect(newStatus).toMatchObject(expected);
+      expect(newStatus).toMatchObject(newParams);
     });
 
     it('delete', async () => {
       const params = testData.statuses.deleting;
-      const existStatus = await models.status.query().findOne({ name: params.name });
+      const existingStatus = await models.status.query().findOne({ name: params.name });
 
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('deleteStatus', { id: existStatus.id }),
+        url: app.reverse('deleteStatus', { id: existingStatus.id }),
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.status.query().findById(existStatus.id);
+      const expected = await models.status.query().findById(existingStatus.id);
 
       expect(expected).toBeUndefined();
     });
   });
 
   describe('error cases', () => {
-    it('auth errors', async () => {
-      const params = testData.statuses.existing;
-      const status = await models.status.query().findOne({ name: params.name });
+    const routesWithData = [
+      ['statuses', 'GET', '', 302],
+      ['newStatus', 'GET', '', 302],
+      ['postStatus', 'POST', '', 302],
+      ['editStatus', 'GET', statusId, 302],
+      ['patchStatus', 'PATCH', statusId, 302],
+      ['deleteStatus', 'DELETE', statusId, 302],
+    ];
 
-      const indexResponse = await app.inject({
-        method: 'GET',
-        url: app.reverse('statuses'),
+    it.each(routesWithData)('%s auth error case', async (route, method, data, expected) => {
+      const response = await app.inject({
+        method,
+        url: app.reverse(route, { id: `${data}` }),
       });
-      expect(indexResponse.statusCode).toBe(302);
 
-      const newResponse = await app.inject({
-        method: 'GET',
-        url: app.reverse('newStatus'),
-      });
-      expect(newResponse.statusCode).toBe(302);
+      expect(response.statusCode).toBe(expected);
 
-      const createResponse = await app.inject({
-        method: 'POST',
-        url: app.reverse('postStatus'),
-      });
-      expect(createResponse.statusCode).toBe(302);
+      const statusFromDB = await models.status.query().findById(statusId);
 
-      const editResponse = await app.inject({
-        method: 'GET',
-        url: app.reverse('editStatus', { id: status.id }),
-      });
-      expect(editResponse.statusCode).toBe(302);
-
-      const updateResponse = await app.inject({
-        method: 'PATCH',
-        url: app.reverse('patchStatus', { id: status.id }),
-      });
-      expect(updateResponse.statusCode).toBe(302);
-
-      const deleteResponse = await app.inject({
-        method: 'DELETE',
-        url: app.reverse('deleteStatus', { id: status.id }),
-      });
-      expect(deleteResponse.statusCode).toBe(302);
+      expect(statusFromDB).toMatchObject(statusParams);
     });
 
     it('create', async () => {
@@ -174,7 +158,7 @@ describe('test statuses CRUD', () => {
         cookies,
       });
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(422);
 
       const status = await models.status.query().findOne({ name: newStatus.name });
 
@@ -194,27 +178,26 @@ describe('test statuses CRUD', () => {
         cookies,
       });
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(422);
 
       const newStatus = await models.status.query().findById(oldStatus.id);
-      const expected = newParams;
 
-      expect(newStatus).not.toMatchObject(expected);
+      expect(newStatus).toMatchObject(params);
     });
 
     it('delete status on task', async () => {
       const params = testData.statuses.existing;
-      const existStatus = await models.status.query().findOne({ name: params.name });
+      const existingStatus = await models.status.query().findOne({ name: params.name });
 
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('deleteStatus', { id: existStatus.id }),
+        url: app.reverse('deleteStatus', { id: existingStatus.id }),
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.status.query().findById(existStatus.id);
+      const expected = await models.status.query().findById(existingStatus.id);
 
       expect(expected).toMatchObject(params);
     });

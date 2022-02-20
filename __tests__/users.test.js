@@ -70,7 +70,7 @@ describe('test users CRUD', () => {
       const user = await models.user.query().findOne({ email: params.email });
       const response = await app.inject({
         method: 'GET',
-        url: `/users/${user.id}/edit`,
+        url: app.reverse('editUser', { id: user.id }),
         cookies,
       });
 
@@ -84,7 +84,7 @@ describe('test users CRUD', () => {
       const oldUser = await models.user.query().findOne({ email: params.email });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('editUser', { id: oldUser.id }),
+        url: app.reverse('patchUser', { id: oldUser.id }),
         payload: {
           data: newParams,
         },
@@ -105,17 +105,17 @@ describe('test users CRUD', () => {
     it('delete', async () => {
       const user = testData.users.deleting;
       const cookies = await signIn(app, user);
-      const existUser = await models.user.query().findOne({ email: user.email });
+      const existingUser = await models.user.query().findOne({ email: user.email });
 
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('deleteUser', { id: existUser.id }),
+        url: app.reverse('deleteUser', { id: existingUser.id }),
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.user.query().findById(existUser.id);
+      const expected = await models.user.query().findById(existingUser.id);
 
       expect(expected).toBeUndefined();
     });
@@ -132,7 +132,7 @@ describe('test users CRUD', () => {
         },
       });
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(422);
 
       const expected = await models.user.query().findById({ email: params.email });
 
@@ -140,18 +140,18 @@ describe('test users CRUD', () => {
     });
 
     it('edit by another user', async () => {
-      const params = testData.users.updating;
-      const existUser = testData.users.existing;
+      const params = testData.users.deleting;
+      const existingUser = testData.users.existing;
 
       const cookies = await signIn(app, params);
-      const user = await models.user.query().findOne({ email: existUser.email });
+      const user = await models.user.query().findOne({ email: existingUser.email });
       const response = await app.inject({
         method: 'GET',
-        url: `/users/${user.id}/edit`,
+        url: app.reverse('editUser', { id: user.id }),
         cookies,
       });
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(302);
     });
 
     it('update with user error', async () => {
@@ -161,54 +161,51 @@ describe('test users CRUD', () => {
       const oldUser = await models.user.query().findOne({ email: params.email });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('editUser', { id: oldUser.id }),
+        url: app.reverse('patchUser', { id: oldUser.id }),
         payload: {
           data: newParams,
         },
         cookies,
       });
 
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(422);
     });
 
     it('delete user by another user', async () => {
       const user = testData.users.deleting;
       const remover = testData.users.existing;
       const cookies = await signIn(app, remover);
-      const existUser = await models.user.query().findOne({ email: user.email });
+      const existingUser = await models.user.query().findOne({ email: user.email });
 
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('deleteUser', { id: existUser.id }),
+        url: app.reverse('deleteUser', { id: existingUser.id }),
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.user.query().findById(existUser.id);
+      const expected = await models.user.query().findById(existingUser.id);
 
-      expect(expected).toMatchObject(existUser);
+      expect(expected).toMatchObject(existingUser);
     });
 
     it('delete task creator', async () => {
-      // const tasks = await models.task.query();
       const user = testData.users.existing;
-      // const remover = testData.users.existing;
       const cookies = await signIn(app, user);
-      const existUser = await models.user.query().findOne({ email: user.email });
-      // console.log(tasks);
+      const existingUser = await models.user.query().findOne({ email: user.email });
 
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('deleteUser', { id: existUser.id }),
+        url: app.reverse('deleteUser', { id: existingUser.id }),
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.user.query().findById(existUser.id);
+      const expected = await models.user.query().findById(existingUser.id);
 
-      expect(expected).toMatchObject(existUser);
+      expect(expected).toMatchObject(existingUser);
     });
   });
 

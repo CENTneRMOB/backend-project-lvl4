@@ -14,15 +14,15 @@ export default (app) => {
       reply.render('users/new', { user });
       return reply;
     })
-    .get('/users/:id/edit', { preValidation: app.authenticate }, async (req, reply) => {
+    .get('/users/:id/edit', { name: 'editUser', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       if (req.user.id === Number(id)) {
         try {
           const user = await app.objection.models.user.query().findById(id);
           reply.render('users/edit', { user });
           return reply;
-        } catch (e) {
-          reply.send(e);
+        } catch (error) {
+          reply.send(error);
           return reply;
         }
       }
@@ -31,20 +31,20 @@ export default (app) => {
       reply.redirect(app.reverse('users'));
       return reply;
     })
-    .post('/users', async (req, reply) => {
+    .post('/users', { name: 'postUser' }, async (req, reply) => {
       try {
         const user = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().insert(user);
         req.flash('info', i18next.t('flash.users.create.success'));
         reply.redirect(app.reverse('root'));
         return reply;
-      } catch (e) {
+      } catch (error) {
         req.flash('error', i18next.t('flash.users.create.error'));
-        reply.render('users/new', { user: req.body.data, errors: e.data });
+        reply.code(422).render('users/new', { user: req.body.data, errors: error.data });
         return reply;
       }
     })
-    .patch('/users/:id', { name: 'editUser', preValidation: app.authenticate }, async (req, reply) => {
+    .patch('/users/:id', { name: 'patchUser', preValidation: app.authenticate }, async (req, reply) => {
       const updatedUser = req.body.data;
       const { id } = req.params;
       const user = await app.objection.models.user.query().findById(id);
@@ -57,7 +57,7 @@ export default (app) => {
         return reply;
       } catch (error) {
         req.flash('error', i18next.t('flash.users.edit.error'));
-        reply.render('users/edit', { user, errors: error.data });
+        reply.code(422).render('users/edit', { user, errors: error.data });
         return reply;
       }
     })
