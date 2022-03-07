@@ -25,7 +25,7 @@ export default (app) => {
         return reply;
       }
     })
-    .post('/statuses', { name: 'postStatus', preValidation: app.authenticate }, async (req, reply) => {
+    .post('/statuses', { name: 'createStatus', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const status = await app.objection.models.status.fromJson(req.body.data);
         await app.objection.models.status.query().insert(status);
@@ -38,7 +38,7 @@ export default (app) => {
         return reply;
       }
     })
-    .patch('/statuses/:id', { name: 'patchStatus', preValidation: app.authenticate }, async (req, reply) => {
+    .patch('/statuses/:id', { name: 'updateStatus', preValidation: app.authenticate }, async (req, reply) => {
       const inputData = req.body.data;
       const { id } = req.params;
       const status = await app.objection.models.status.query().findById(id);
@@ -58,7 +58,6 @@ export default (app) => {
     .delete('/statuses/:id', { name: 'deleteStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const userId = req.user.id;
-      // const status = await app.objection.models.status.query().findById(id);
       const { taskStatus } = await app.objection.models.status.query().findById(id).withGraphJoined('[taskStatus]');
       if (!userId || taskStatus.length !== 0) {
         req.flash('error', i18next.t('flash.statuses.delete.error'));

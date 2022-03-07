@@ -67,7 +67,7 @@ export default (app) => {
       });
       return reply;
     })
-    .get('/tasks/:id', { name: 'viewTask', preValidation: app.authenticate }, async (req, reply) => {
+    .get('/tasks/:id', { name: 'task', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status, labels]');
       reply.render('tasks/view', { task });
@@ -89,7 +89,7 @@ export default (app) => {
         return reply;
       }
     })
-    .post('/tasks', { name: 'postTask', preValidation: app.authenticate }, async (req, reply) => {
+    .post('/tasks', { name: 'createTask', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const {
           name,
@@ -139,11 +139,10 @@ export default (app) => {
         reply.code(422).render('tasks/new', {
           task: req.body.data, statuses, users, labels, errors: error.data,
         });
-        // reply.send(error);
         return reply;
       }
     })
-    .patch('/tasks/:id', { name: 'patchTask', preValidation: app.authenticate }, async (req, reply) => {
+    .patch('/tasks/:id', { name: 'updateTask', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const {
           name,
@@ -194,7 +193,6 @@ export default (app) => {
         reply.code(422).render('tasks/edit', {
           task: req.body.data, statuses, users, labels, errors: error.data,
         });
-        // reply.send(error);
         return reply;
       }
     })

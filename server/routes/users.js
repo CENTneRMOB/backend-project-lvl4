@@ -31,7 +31,7 @@ export default (app) => {
       reply.redirect(app.reverse('users'));
       return reply;
     })
-    .post('/users', { name: 'postUser' }, async (req, reply) => {
+    .post('/users', { name: 'createUser' }, async (req, reply) => {
       try {
         const user = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().insert(user);
@@ -44,7 +44,7 @@ export default (app) => {
         return reply;
       }
     })
-    .patch('/users/:id', { name: 'patchUser', preValidation: app.authenticate }, async (req, reply) => {
+    .patch('/users/:id', { name: 'updateUser', preValidation: app.authenticate }, async (req, reply) => {
       const updatedUser = req.body.data;
       const { id } = req.params;
       const user = await app.objection.models.user.query().findById(id);

@@ -56,7 +56,7 @@ describe('test labels CRUD', () => {
       const newLabel = testData.labels.new;
       const response = await app.inject({
         method: 'POST',
-        url: app.reverse('postLabel'),
+        url: app.reverse('createLabel'),
         payload: {
           data: newLabel,
         },
@@ -91,7 +91,7 @@ describe('test labels CRUD', () => {
       const oldLabel = await models.label.query().findOne({ name: params.name });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('patchLabel', { id: oldLabel.id }),
+        url: app.reverse('updateLabel', { id: oldLabel.id }),
         payload: {
           data: newParams,
         },
@@ -100,9 +100,9 @@ describe('test labels CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const newLabel = await models.label.query().findById(oldLabel.id);
+      const actual = await models.label.query().findById(oldLabel.id);
 
-      expect(newLabel).toMatchObject(newParams);
+      expect(actual).toMatchObject(newParams);
     });
 
     it('delete', async () => {
@@ -117,71 +117,91 @@ describe('test labels CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.label.query().findById(existingLabel.id);
+      const actual = await models.label.query().findById(existingLabel.id);
 
-      expect(expected).toBeUndefined();
+      expect(actual).toBeUndefined();
     });
   });
 
   describe('error cases', () => {
-    const routesWithData = [
-      ['labels', 'GET', '', 302],
-      ['newLabel', 'GET', '', 302],
-      ['postLabel', 'POST', '', 302],
-      ['editLabel', 'GET', labelId, 302],
-      ['patchLabel', 'PATCH', labelId, 302],
-      ['deleteLabel', 'DELETE', labelId, 302],
-    ];
+    const routesWithParams = {
+      withoutParams: [
+        ['labels', 'GET'],
+        ['newLabel', 'GET'],
+        ['createLabel', 'POST'],
+      ],
+      getParams: [['editLabel', 'GET', labelId]],
+      changeParams: [
+        ['updateLabel', 'PATCH', labelId],
+        ['deleteLabel', 'DELETE', labelId],
+      ],
+    };
 
-    it.each(routesWithData)('%s auth error case', async (route, method, data, expected) => {
+    it.each(routesWithParams.withoutParams)('%s auth error case without params', async (route, method) => {
       const response = await app.inject({
         method,
-        url: app.reverse(route, { id: `${data}` }),
+        url: app.reverse(route),
       });
 
-      expect(response.statusCode).toBe(expected);
+      expect(response.statusCode).toBe(302);
+    });
 
-      const labelFromDB = await models.label.query().findById(labelId);
+    it.each(routesWithParams.getParams)('%s auth GET error case with param', async (route, method, param) => {
+      const response = await app.inject({
+        method,
+        url: app.reverse(route, { id: `${param}` }),
+      });
 
-      expect(labelFromDB).toMatchObject(labelParams);
+      expect(response.statusCode).toBe(302);
+    });
+
+    it.each(routesWithParams.changeParams)('%s auth error case with param', async (route, method, param) => {
+      const response = await app.inject({
+        method,
+        url: app.reverse(route, { id: `${param}` }),
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const actual = await models.label.query().findById(labelId);
+
+      expect(actual).toMatchObject(labelParams);
     });
 
     it('create', async () => {
-      const newLabel = testData.labels.newWithError;
       const response = await app.inject({
         method: 'POST',
-        url: app.reverse('postLabel'),
+        url: app.reverse('createLabel'),
         payload: {
-          data: newLabel,
+          data: { name: '' },
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(422);
 
-      const label = await models.label.query().findOne({ name: newLabel.name });
+      const label = await models.label.query().findOne({ name: '' });
 
       expect(label).toBeUndefined();
     });
 
     it('update', async () => {
-      const newParams = testData.labels.updatingWithError;
       const params = testData.labels.existing;
       const oldLabel = await models.label.query().findOne({ name: params.name });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('patchLabel', { id: oldLabel.id }),
+        url: app.reverse('updateLabel', { id: oldLabel.id }),
         payload: {
-          data: newParams,
+          data: { name: '' },
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(422);
 
-      const newLabel = await models.label.query().findById(oldLabel.id);
+      const actual = await models.label.query().findById(oldLabel.id);
 
-      expect(newLabel).toMatchObject(params);
+      expect(actual).toMatchObject(params);
     });
 
     it('delete label on task', async () => {
@@ -196,9 +216,9 @@ describe('test labels CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.label.query().findById(existingLabel.id);
+      const actual = await models.label.query().findById(existingLabel.id);
 
-      expect(expected).toMatchObject(params);
+      expect(actual).toMatchObject(params);
     });
   });
 

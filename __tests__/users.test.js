@@ -84,7 +84,7 @@ describe('test users CRUD', () => {
       const oldUser = await models.user.query().findOne({ email: params.email });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('patchUser', { id: oldUser.id }),
+        url: app.reverse('updateUser', { id: oldUser.id }),
         payload: {
           data: newParams,
         },
@@ -115,9 +115,9 @@ describe('test users CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.user.query().findById(existingUser.id);
+      const actual = await models.user.query().findById(existingUser.id);
 
-      expect(expected).toBeUndefined();
+      expect(actual).toBeUndefined();
     });
   });
 
@@ -161,7 +161,7 @@ describe('test users CRUD', () => {
       const oldUser = await models.user.query().findOne({ email: params.email });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('patchUser', { id: oldUser.id }),
+        url: app.reverse('updateUser', { id: oldUser.id }),
         payload: {
           data: newParams,
         },
@@ -173,8 +173,7 @@ describe('test users CRUD', () => {
 
     it('delete user by another user', async () => {
       const user = testData.users.deleting;
-      const remover = testData.users.existing;
-      const cookies = await signIn(app, remover);
+      const cookies = await signIn(app, testData.users.existing);
       const existingUser = await models.user.query().findOne({ email: user.email });
 
       const response = await app.inject({
@@ -185,9 +184,9 @@ describe('test users CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.user.query().findById(existingUser.id);
+      const actual = await models.user.query().findById(existingUser.id);
 
-      expect(expected).toMatchObject(existingUser);
+      expect(actual).toMatchObject(existingUser);
     });
 
     it('delete task creator', async () => {
@@ -203,9 +202,9 @@ describe('test users CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.user.query().findById(existingUser.id);
+      const actual = await models.user.query().findById(existingUser.id);
 
-      expect(expected).toMatchObject(existingUser);
+      expect(actual).toMatchObject(existingUser);
     });
   });
 

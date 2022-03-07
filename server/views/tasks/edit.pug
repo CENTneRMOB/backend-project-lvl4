@@ -4,7 +4,7 @@ block header
   = t('views.tasks.exist.editing')
 
 block content
-  +formFor()(action=route('patchTask', { id: task.id }) method='post')
+  +formFor()(action=route('updateTask', { id: task.id }) method='post')
     +input(task, 'name', errors, 'tasks')(type="text")
     +textarea(task, 'description', errors, 'tasks')(type="text")
     +select(task, statuses, 'statusId', errors, 'tasks')

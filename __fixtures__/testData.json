@@ -41,12 +41,6 @@
     },
     "deleting": {
       "name": "thirdStatus"
-    },
-    "newWithError": {
-      "name": ""
-    },
-    "updatingWithError": {
-      "name": ""
     }
   },
   "tasks": {
@@ -60,9 +54,13 @@
       "name": "task2"
     },
     "updating": {
-      "name": "updateTask",
-      "description": "update description for task",
-      "executorId": 3
+      "name": "task2",
+      "description": "update description for task2",
+      "executorId": 3,
+      "id": 2,
+      "statusId": 2,
+      "creatorId": 2,
+      "labelsId": ""
     },
     "deleting": {
       "name": "task3"
@@ -91,12 +89,6 @@
     },
     "deleting": {
       "name": "thirdLabel"
-    },
-    "newWithError": {
-      "name": ""
-    },
-    "updatingWithError": {
-      "name": ""
     },
     "labelFromTask": {
       "name": "taskLabel"

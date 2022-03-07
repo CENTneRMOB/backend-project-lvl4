@@ -57,7 +57,7 @@ describe('test statuses CRUD', () => {
       const newStatus = testData.statuses.new;
       const response = await app.inject({
         method: 'POST',
-        url: app.reverse('postStatus'),
+        url: app.reverse('createStatus'),
         payload: {
           data: newStatus,
         },
@@ -92,7 +92,7 @@ describe('test statuses CRUD', () => {
       const oldStatus = await models.status.query().findOne({ name: params.name });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('patchStatus', { id: oldStatus.id }),
+        url: app.reverse('updateStatus', { id: oldStatus.id }),
         payload: {
           data: newParams,
         },
@@ -101,9 +101,9 @@ describe('test statuses CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const newStatus = await models.status.query().findById(oldStatus.id);
+      const actual = await models.status.query().findById(oldStatus.id);
 
-      expect(newStatus).toMatchObject(newParams);
+      expect(actual).toMatchObject(newParams);
     });
 
     it('delete', async () => {
@@ -118,71 +118,91 @@ describe('test statuses CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.status.query().findById(existingStatus.id);
+      const actual = await models.status.query().findById(existingStatus.id);
 
-      expect(expected).toBeUndefined();
+      expect(actual).toBeUndefined();
     });
   });
 
   describe('error cases', () => {
-    const routesWithData = [
-      ['statuses', 'GET', '', 302],
-      ['newStatus', 'GET', '', 302],
-      ['postStatus', 'POST', '', 302],
-      ['editStatus', 'GET', statusId, 302],
-      ['patchStatus', 'PATCH', statusId, 302],
-      ['deleteStatus', 'DELETE', statusId, 302],
-    ];
+    const routesWithParams = {
+      withoutParams: [
+        ['statuses', 'GET'],
+        ['newStatus', 'GET'],
+        ['createStatus', 'POST'],
+      ],
+      getParams: [['editStatus', 'GET', statusId]],
+      changeParams: [
+        ['updateStatus', 'PATCH', statusId],
+        ['deleteStatus', 'DELETE', statusId],
+      ],
+    };
 
-    it.each(routesWithData)('%s auth error case', async (route, method, data, expected) => {
+    it.each(routesWithParams.withoutParams)('%s auth error case without params', async (route, method) => {
       const response = await app.inject({
         method,
-        url: app.reverse(route, { id: `${data}` }),
+        url: app.reverse(route),
       });
 
-      expect(response.statusCode).toBe(expected);
+      expect(response.statusCode).toBe(302);
+    });
 
-      const statusFromDB = await models.status.query().findById(statusId);
+    it.each(routesWithParams.getParams)('%s auth GET error case with param', async (route, method, param) => {
+      const response = await app.inject({
+        method,
+        url: app.reverse(route, { id: `${param}` }),
+      });
 
-      expect(statusFromDB).toMatchObject(statusParams);
+      expect(response.statusCode).toBe(302);
+    });
+
+    it.each(routesWithParams.changeParams)('%s auth error case with param', async (route, method, param) => {
+      const response = await app.inject({
+        method,
+        url: app.reverse(route, { id: `${param}` }),
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const actual = await models.status.query().findById(statusId);
+
+      expect(actual).toMatchObject(statusParams);
     });
 
     it('create', async () => {
-      const newStatus = testData.statuses.newWithError;
       const response = await app.inject({
         method: 'POST',
-        url: app.reverse('postStatus'),
+        url: app.reverse('createStatus'),
         payload: {
-          data: newStatus,
+          data: { name: '' },
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(422);
 
-      const status = await models.status.query().findOne({ name: newStatus.name });
+      const status = await models.status.query().findOne({ name: '' });
 
       expect(status).toBeUndefined();
     });
 
     it('update', async () => {
-      const newParams = testData.statuses.updatingWithError;
       const params = testData.statuses.existing;
       const oldStatus = await models.status.query().findOne({ name: params.name });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('patchStatus', { id: oldStatus.id }),
+        url: app.reverse('updateStatus', { id: oldStatus.id }),
         payload: {
-          data: newParams,
+          data: { name: '' },
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(422);
 
-      const newStatus = await models.status.query().findById(oldStatus.id);
+      const actual = await models.status.query().findById(oldStatus.id);
 
-      expect(newStatus).toMatchObject(params);
+      expect(actual).toMatchObject(params);
     });
 
     it('delete status on task', async () => {
@@ -197,9 +217,9 @@ describe('test statuses CRUD', () => {
 
       expect(response.statusCode).toBe(302);
 
-      const expected = await models.status.query().findById(existingStatus.id);
+      const actual = await models.status.query().findById(existingStatus.id);
 
-      expect(expected).toMatchObject(params);
+      expect(actual).toMatchObject(params);
     });
   });
 

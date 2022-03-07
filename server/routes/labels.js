@@ -30,7 +30,7 @@ export default (app) => {
         return reply;
       }
     })
-    .post('/labels', { name: 'postLabel', preValidation: app.authenticate }, async (req, reply) => {
+    .post('/labels', { name: 'createLabel', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const label = await app.objection.models.label.fromJson(req.body.data);
         await app.objection.models.label.query().insert(label);
@@ -43,7 +43,7 @@ export default (app) => {
         return reply;
       }
     })
-    .patch('/labels/:id', { name: 'patchLabel', preValidation: app.authenticate }, async (req, reply) => {
+    .patch('/labels/:id', { name: 'updateLabel', preValidation: app.authenticate }, async (req, reply) => {
       const inputData = req.body.data;
       const { id } = req.params;
       const label = await app.objection.models.label.query().findById(id);
