@@ -5,11 +5,10 @@ exports.up = (knex) => (
     table.increments('id').primary();
     table.string('name').notNullable();
     table.string('description');
-    table.integer('status_id').references('id').inTable('statuses');
-    table.integer('creator_id').references('id').inTable('users');
-    table.integer('executor_id').nullable().references('id').inTable('users');
-    table.timestamp('created_at').defaultTo(knex.fn.now());
-    table.timestamp('updated_at').defaultTo(knex.fn.now());
+    table.integer('status_id').references('statuses.id');
+    table.integer('creator_id').references('users.id');
+    table.integer('executor_id').references('users.id');
+    table.timestamps(true, true);
   })
 );
 
