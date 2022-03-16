@@ -123,20 +123,11 @@ describe('test tasks CRUD', () => {
   });
 
   describe('error cases', () => {
-    const routesWithParams = {
-      withoutParams: [
-        ['tasks', 'GET'],
-        ['newTask', 'GET'],
-        ['createTask', 'POST'],
-      ],
-      getParams: [['editTask', 'GET', taskId]],
-      changeParams: [
-        ['updateTask', 'PATCH', taskId],
-        ['deleteTask', 'DELETE', taskId],
-      ],
-    };
-
-    it.each(routesWithParams.withoutParams)('%s auth error case without params', async (route, method) => {
+    it.each([
+      ['tasks', 'GET'],
+      ['newTask', 'GET'],
+      ['createTask', 'POST'],
+    ])('%s auth error case without params', async (route, method) => {
       const response = await app.inject({
         method,
         url: app.reverse(route),
@@ -145,19 +136,14 @@ describe('test tasks CRUD', () => {
       expect(response.statusCode).toBe(302);
     });
 
-    it.each(routesWithParams.getParams)('%s auth GET error case with param', async (route, method, param) => {
+    it.each([
+      ['editTask', 'GET'],
+      ['updateTask', 'PATCH'],
+      ['deleteTask', 'DELETE'],
+    ])('%s auth error case with param', async (route, method) => {
       const response = await app.inject({
         method,
-        url: app.reverse(route, { id: `${param}` }),
-      });
-
-      expect(response.statusCode).toBe(302);
-    });
-
-    it.each(routesWithParams.changeParams)('%s auth error case with param', async (route, method, param) => {
-      const response = await app.inject({
-        method,
-        url: app.reverse(route, { id: `${param}` }),
+        url: app.reverse(route, { id: taskId }),
       });
 
       expect(response.statusCode).toBe(302);
@@ -189,12 +175,11 @@ describe('test tasks CRUD', () => {
       const newParams = testData.tasks.updatingWithError;
       const params = testData.tasks.existing;
       const oldTask = await models.task.query().findOne({ name: params.name });
-      const data = Object.assign(oldTask, newParams);
       const response = await app.inject({
         method: 'PATCH',
         url: app.reverse('updateTask', { id: oldTask.id }),
         payload: {
-          data,
+          data: newParams,
         },
         cookies,
       });

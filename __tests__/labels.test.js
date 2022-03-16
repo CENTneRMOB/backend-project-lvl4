@@ -124,20 +124,11 @@ describe('test labels CRUD', () => {
   });
 
   describe('error cases', () => {
-    const routesWithParams = {
-      withoutParams: [
-        ['labels', 'GET'],
-        ['newLabel', 'GET'],
-        ['createLabel', 'POST'],
-      ],
-      getParams: [['editLabel', 'GET', labelId]],
-      changeParams: [
-        ['updateLabel', 'PATCH', labelId],
-        ['deleteLabel', 'DELETE', labelId],
-      ],
-    };
-
-    it.each(routesWithParams.withoutParams)('%s auth error case without params', async (route, method) => {
+    it.each([
+      ['labels', 'GET'],
+      ['newLabel', 'GET'],
+      ['createLabel', 'POST'],
+    ])('%s auth error case without params', async (route, method) => {
       const response = await app.inject({
         method,
         url: app.reverse(route),
@@ -146,19 +137,14 @@ describe('test labels CRUD', () => {
       expect(response.statusCode).toBe(302);
     });
 
-    it.each(routesWithParams.getParams)('%s auth GET error case with param', async (route, method, param) => {
+    it.each([
+      ['editLabel', 'GET'],
+      ['updateLabel', 'PATCH'],
+      ['deleteLabel', 'DELETE'],
+    ])('%s auth error case with param', async (route, method) => {
       const response = await app.inject({
         method,
-        url: app.reverse(route, { id: `${param}` }),
-      });
-
-      expect(response.statusCode).toBe(302);
-    });
-
-    it.each(routesWithParams.changeParams)('%s auth error case with param', async (route, method, param) => {
-      const response = await app.inject({
-        method,
-        url: app.reverse(route, { id: `${param}` }),
+        url: app.reverse(route, { id: labelId }),
       });
 
       expect(response.statusCode).toBe(302);
@@ -173,16 +159,12 @@ describe('test labels CRUD', () => {
         method: 'POST',
         url: app.reverse('createLabel'),
         payload: {
-          data: { name: '' },
+          data: {},
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(422);
-
-      const label = await models.label.query().findOne({ name: '' });
-
-      expect(label).toBeUndefined();
     });
 
     it('update', async () => {
@@ -198,10 +180,6 @@ describe('test labels CRUD', () => {
       });
 
       expect(response.statusCode).toBe(422);
-
-      const actual = await models.label.query().findById(oldLabel.id);
-
-      expect(actual).toMatchObject(params);
     });
 
     it('delete label on task', async () => {

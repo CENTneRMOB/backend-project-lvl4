@@ -2,7 +2,7 @@
 
 exports.up = (knex) => (
   knex.schema.table('tasks', (table) => {
-    table.string('labels_id').nullable();
+    table.string('labels_id');
   })
 );
 

@@ -59,8 +59,7 @@
       "executorId": 3,
       "id": 2,
       "statusId": 2,
-      "creatorId": 2,
-      "labelsId": ""
+      "creatorId": 2
     },
     "deleting": {
       "name": "task3"
@@ -68,12 +67,12 @@
     "newWithError": {
       "name": "newTaskwithError",
       "description": "new task description",
-      "statusId": "",
       "executorId": 2
     },
     "updatingWithError": {
       "name": "",
       "description": "update description for task",
+      "statusId": 2,
       "executorId": 3
     }
   },

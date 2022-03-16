@@ -125,20 +125,11 @@ describe('test statuses CRUD', () => {
   });
 
   describe('error cases', () => {
-    const routesWithParams = {
-      withoutParams: [
-        ['statuses', 'GET'],
-        ['newStatus', 'GET'],
-        ['createStatus', 'POST'],
-      ],
-      getParams: [['editStatus', 'GET', statusId]],
-      changeParams: [
-        ['updateStatus', 'PATCH', statusId],
-        ['deleteStatus', 'DELETE', statusId],
-      ],
-    };
-
-    it.each(routesWithParams.withoutParams)('%s auth error case without params', async (route, method) => {
+    it.each([
+      ['statuses', 'GET'],
+      ['newStatus', 'GET'],
+      ['createStatus', 'POST'],
+    ])('%s auth error case without params', async (route, method) => {
       const response = await app.inject({
         method,
         url: app.reverse(route),
@@ -147,19 +138,14 @@ describe('test statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
     });
 
-    it.each(routesWithParams.getParams)('%s auth GET error case with param', async (route, method, param) => {
+    it.each([
+      ['editStatus', 'GET'],
+      ['updateStatus', 'PATCH'],
+      ['deleteStatus', 'DELETE'],
+    ])('%s auth error case with param', async (route, method) => {
       const response = await app.inject({
         method,
-        url: app.reverse(route, { id: `${param}` }),
-      });
-
-      expect(response.statusCode).toBe(302);
-    });
-
-    it.each(routesWithParams.changeParams)('%s auth error case with param', async (route, method, param) => {
-      const response = await app.inject({
-        method,
-        url: app.reverse(route, { id: `${param}` }),
+        url: app.reverse(route, { id: statusId }),
       });
 
       expect(response.statusCode).toBe(302);
@@ -174,16 +160,12 @@ describe('test statuses CRUD', () => {
         method: 'POST',
         url: app.reverse('createStatus'),
         payload: {
-          data: { name: '' },
+          data: {},
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(422);
-
-      const status = await models.status.query().findOne({ name: '' });
-
-      expect(status).toBeUndefined();
     });
 
     it('update', async () => {
@@ -199,10 +181,6 @@ describe('test statuses CRUD', () => {
       });
 
       expect(response.statusCode).toBe(422);
-
-      const actual = await models.status.query().findById(oldStatus.id);
-
-      expect(actual).toMatchObject(params);
     });
 
     it('delete status on task', async () => {
