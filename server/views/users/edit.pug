@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block header
-  = t('views.users.exist.editing')
+  = t('views.users.edit.title')
 
 block content
   +formFor()(action=route('updateUser', { id: user.id }) method='post')
@@ -10,4 +10,4 @@ block content
     +input(user, 'email', errors, 'users')(type="text")
     +input(user, 'password', errors, 'users')(type="password")
     input(name='_method' type='hidden' value='patch')
-    +submit(user)(value=t('views.users.exist.edit'))
+    +submit(user)(value=t('views.users.edit.confirm'))

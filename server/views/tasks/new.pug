@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block header
-  = t('views.tasks.new.creating')
+  = t('views.tasks.new.title')
 
 block content
   +formFor()(action=route('createTask') method='post')
@@ -10,4 +10,4 @@ block content
     +select(task, statuses, 'statusId', errors, 'tasks')
     +select(task, users, 'executorId', errors, 'tasks')
     +select(task, labels, 'labels', errors, 'tasks')
-    +submit(task)(value=t('views.tasks.new.createConfirm'))
+    +submit(task)(value=t('views.tasks.new.submit'))

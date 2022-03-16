@@ -23,9 +23,9 @@ block content
           .col= formatDate(task.createdAt)
         .row.p-1
           .col
-            h6= t('views.tasks.labels')
+            h6= t('views.tasks.filter.labels')
             +list(task.labels)
         .row.p-1
           .col
-            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.exist.edit')
-            +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-link" value=t('views.tasks.exist.delete'))
+            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.edit.confirm')
+            +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-link" value=t('views.tasks.delete.confirm'))

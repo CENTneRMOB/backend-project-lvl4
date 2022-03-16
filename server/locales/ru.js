@@ -2,7 +2,7 @@
 
 module.exports = {
   translation: {
-    appName: 'Fastify Шаблон',
+    appName: 'Task manager',
     flash: {
       session: {
         create: {
@@ -21,10 +21,12 @@ module.exports = {
         edit: {
           error: 'Не удалось изменить пользователя',
           success: 'Пользователь успешно изменён',
+          wrongAuth: 'Вы не можете редактировать или удалять другого пользователя.',
         },
         delete: {
           error: 'Не удалось удалить пользователя',
           success: 'Пользователь успешно удалён',
+          wrongAuth: 'Вы не можете редактировать или удалять другого пользователя.',
         },
       },
       statuses: {
@@ -70,7 +72,6 @@ module.exports = {
         },
       },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
-      wrongAuth: 'Вы не можете редактировать или удалять другого пользователя.',
     },
     layouts: {
       application: {
@@ -104,10 +105,12 @@ module.exports = {
           submit: 'Сохранить',
           signUp: 'Регистрация',
         },
-        exist: {
-          editing: 'Изменение пользователя',
-          edit: 'Изменить',
-          delete: 'Удалить',
+        edit: {
+          title: 'Изменение пользователя',
+          confirm: 'Изменить',
+        },
+        delete: {
+          confirm: 'Удалить',
         },
       },
       welcome: {
@@ -121,15 +124,17 @@ module.exports = {
         id: 'ID',
         name: 'Наименование',
         createdAt: 'Дата создания',
-        exist: {
-          editing: 'Изменение статуса',
-          edit: 'Изменить',
-          delete: 'Удалить',
+        create: 'Создать статус',
+        edit: {
+          title: 'Изменение статуса',
+          confirm: 'Изменить',
+        },
+        delete: {
+          confirm: 'Удалить',
         },
         new: {
-          create: 'Создать статус',
-          creating: 'Создание статуса',
-          createConfirm: 'Создать',
+          title: 'Создание статуса',
+          submit: 'Создать',
         },
       },
       tasks: {
@@ -141,33 +146,39 @@ module.exports = {
         executorId: 'Исполнитель',
         createdAt: 'Дата создания',
         labels: 'Метки',
-        label: 'Метка',
-        isCreatorUser: 'Только мои задачи',
-        show: 'Показать',
+        create: 'Создать задачу',
         new: {
-          create: 'Создать задачу',
-          creating: 'Создание задачи',
-          createConfirm: 'Создать',
+          title: 'Создание задачи',
+          submit: 'Создать',
         },
-        exist: {
-          edit: 'Изменить',
-          delete: 'Удалить',
-          editing: 'Изменение задачи',
+        edit: {
+          confirm: 'Изменить',
+          title: 'Изменение задачи',
+        },
+        delete: {
+          confirm: 'Удалить',
+        },
+        filter: {
+          label: 'Метка',
+          isCreatorUser: 'Только мои задачи',
+          show: 'Показать',
         },
       },
       labels: {
         id: 'ID',
         name: 'Наименование',
         createdAt: 'Дата создания',
-        exist: {
-          editing: 'Изменение метки',
-          edit: 'Изменить',
-          delete: 'Удалить',
+        create: 'Создать метку',
+        edit: {
+          title: 'Изменение метки',
+          confirm: 'Изменить',
+        },
+        delete: {
+          confirm: 'Удалить',
         },
         new: {
-          create: 'Создать метку',
-          creating: 'Создание метки',
-          createConfirm: 'Создать',
+          title: 'Создание метки',
+          submit: 'Создать',
         },
       },
     },

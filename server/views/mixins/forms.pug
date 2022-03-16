@@ -104,7 +104,7 @@ mixin checkbox(name, queryParams = {})
   input(id=inputId class='form-check-input' type='checkbox' name=name checked=(
     _.has(queryParams, 'creator') ? 'on' : false
   ))
-  label(class= 'form-check-label' for= inputId)= t(`views.tasks.${name}`)
+  label(class= 'form-check-label' for= inputId)= t(`views.tasks.filter.${name}`)
 
 mixin filterSelect(items, propertyName, itemType, queryParams = {})
   - classLine = 'form-control ml-2 mr3'

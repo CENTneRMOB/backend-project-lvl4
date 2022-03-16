@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block content
-  a(href=route('newStatus'))= t('views.statuses.new.create')
+  a(href=route('newStatus'))= t('views.statuses.create')
   table.table.table-striped
     thead
       tr
@@ -16,5 +16,5 @@ block content
           td= status.name
           td= formatDate(status.createdAt)
           td
-            a(href=`/statuses/${status.id}/edit`)= t('views.statuses.exist.edit')
-            +buttonTo(`/statuses/${status.id}`, 'delete')(class="btn btn-link" value=t('views.statuses.exist.delete'))
+            a(href=`/statuses/${status.id}/edit`)= t('views.statuses.edit.confirm')
+            +buttonTo(`/statuses/${status.id}`, 'delete')(class="btn btn-link" value=t('views.statuses.delete.confirm'))

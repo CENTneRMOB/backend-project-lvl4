@@ -27,7 +27,7 @@ export default (app) => {
         }
       }
 
-      req.flash('error', i18next.t('flash.wrongAuth'));
+      req.flash('error', i18next.t('flash.users.edit.wrongAuth'));
       reply.redirect(app.reverse('users'));
       return reply;
     })
@@ -83,7 +83,7 @@ export default (app) => {
         }
       }
 
-      req.flash('error', i18next.t('flash.wrongAuth'));
+      req.flash('error', i18next.t('flash.users.delete.wrongAuth'));
       reply.redirect(app.reverse('users'));
       return reply;
     });
