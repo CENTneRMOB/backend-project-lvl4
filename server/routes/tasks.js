@@ -108,13 +108,13 @@ export default (app) => {
         const task = await app.objection.models.task.fromJson(dataObj);
         await app.objection.models.task.query().insert(task);
 
-        // const labelsArray = labelsData.split(',');
+        const labelsArray = labelsData.split(',');
 
-        // labelsArray.forEach(async (labelId) => {
-        //   const object = { taskId: task.id, labelId: Number(labelId) };
+        labelsArray.forEach(async (labelId) => {
+          const object = { taskId: task.id, labelId: Number(labelId) };
 
-        //   await app.objection.models.tasklabel.query().insert(object);
-        // });
+          await app.objection.models.tasklabel.query().insert(object);
+        });
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
@@ -159,15 +159,15 @@ export default (app) => {
 
         const { id } = req.params;
         const task = await app.objection.models.task.query().findById(id).withGraphJoined('labels');
-        // await app.objection.models.tasklabel.query().delete().where('task_id', '=', task.id);
+        await app.objection.models.tasklabel.query().delete().where('task_id', '=', task.id);
 
-        // const labelsArray = labelsData.split(',');
+        const labelsArray = labelsData.split(',');
 
-        // labelsArray.forEach(async (labelId) => {
-        //   const object = { taskId: Number(id), labelId: Number(labelId) };
+        labelsArray.forEach(async (labelId) => {
+          const object = { taskId: Number(id), labelId: Number(labelId) };
 
-        //   await app.objection.models.tasklabel.query().insert(object);
-        // });
+          await app.objection.models.tasklabel.query().insert(object);
+        });
 
         await task.$query().patch(dataObj);
         req.flash('info', i18next.t('flash.tasks.edit.success'));
@@ -195,7 +195,7 @@ export default (app) => {
       }
 
       await app.objection.models.task.query().deleteById(id);
-      // await app.objection.models.tasklabel.query().delete().where('task_id', '=', id);
+      await app.objection.models.tasklabel.query().delete().where('task_id', '=', id);
       req.flash('info', i18next.t('flash.tasks.delete.success'));
       reply.redirect(app.reverse('tasks'));
       return reply;
