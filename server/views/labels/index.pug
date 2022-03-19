@@ -16,5 +16,5 @@ block content
           td= label.name
           td= formatDate(label.createdAt)
           td
-            a(href=`/labels/${label.id}/edit`)= t('views.labels.edit.confirm')
-            +buttonTo(`/labels/${label.id}`, 'delete')(class="btn btn-link" value=t('views.labels.delete.confirm'))
+            a(href=`/labels/${label.id}/edit`)= t('views.labels.edit.submit')
+            +buttonTo(`/labels/${label.id}`, 'delete')(class="btn btn-link" value=t('views.labels.delete.submit'))

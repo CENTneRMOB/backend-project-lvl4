@@ -16,5 +16,5 @@ block content
           td= status.name
           td= formatDate(status.createdAt)
           td
-            a(href=`/statuses/${status.id}/edit`)= t('views.statuses.edit.confirm')
-            +buttonTo(`/statuses/${status.id}`, 'delete')(class="btn btn-link" value=t('views.statuses.delete.confirm'))
+            a(href=`/statuses/${status.id}/edit`)= t('views.statuses.edit.submit')
+            +buttonTo(`/statuses/${status.id}`, 'delete')(class="btn btn-link" value=t('views.statuses.delete.submit'))

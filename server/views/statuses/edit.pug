@@ -7,4 +7,4 @@ block content
   +formFor()(action=route('updateStatus', { id: status.id }) method='post')
     +input(status, 'name', errors, 'statuses')(type="text")
     input(name='_method' type='hidden' value='patch')
-    +submit(status)(value=t('views.statuses.edit.confirm'))
+    +submit(status)(value=t('views.statuses.edit.submit'))

@@ -18,5 +18,5 @@ block content
           td= formatDate(user.createdAt)
             if isAuthenticated()
               td
-                a(href=`/users/${user.id}/edit`)= t('views.users.edit.confirm')
-                +buttonTo(`/users/${user.id}`, 'delete')(class="btn nav-link" value=t('views.users.delete.confirm'))
+                a(href=`/users/${user.id}/edit`)= t('views.users.edit.submit')
+                +buttonTo(`/users/${user.id}`, 'delete')(class="btn nav-link" value=t('views.users.delete.submit'))

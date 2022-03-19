@@ -5,14 +5,9 @@ import i18next from 'i18next';
 export default (app) => {
   app
     .get('/labels', { name: 'labels', preValidation: app.authenticate }, async (req, reply) => {
-      try {
-        const labels = await app.objection.models.label.query();
-        reply.render('labels/index', { labels });
-        return reply;
-      } catch (error) {
-        reply.send(error);
-        return reply;
-      }
+      const labels = await app.objection.models.label.query();
+      reply.render('labels/index', { labels });
+      return reply;
     })
     .get('/labels/new', { name: 'newLabel', preValidation: app.authenticate }, async (req, reply) => {
       const label = new app.objection.models.label();
@@ -21,14 +16,10 @@ export default (app) => {
     })
     .get('/labels/:id/edit', { name: 'editLabel', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      try {
-        const label = await app.objection.models.label.query().findById(id);
-        reply.render('labels/edit', { label });
-        return reply;
-      } catch (error) {
-        reply.send(error);
-        return reply;
-      }
+
+      const label = await app.objection.models.label.query().findById(id);
+      reply.render('labels/edit', { label });
+      return reply;
     })
     .post('/labels', { name: 'createLabel', preValidation: app.authenticate }, async (req, reply) => {
       try {
@@ -44,12 +35,11 @@ export default (app) => {
       }
     })
     .patch('/labels/:id', { name: 'updateLabel', preValidation: app.authenticate }, async (req, reply) => {
-      const inputData = req.body.data;
       const { id } = req.params;
       const label = await app.objection.models.label.query().findById(id);
 
       try {
-        await label.$query().patch(inputData);
+        await label.$query().patch(req.body.data);
         req.flash('info', i18next.t('flash.labels.edit.success'));
 
         reply.redirect(app.reverse('labels'));
@@ -62,20 +52,19 @@ export default (app) => {
     })
     .delete('/labels/:id', { name: 'deleteLabel', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const { taskLabel } = await app.objection.models.label.query().findById(id).withGraphJoined('[taskLabel]');
-      if (taskLabel.length !== 0) {
+      const { labeledTasks } = await app.objection.models.label.query()
+        .findById(id)
+        .withGraphJoined('labeledTasks');
+
+      if (labeledTasks.length !== 0) {
         req.flash('error', i18next.t('flash.labels.delete.error'));
         reply.redirect('/labels');
         return reply;
       }
-      try {
-        await app.objection.models.label.query().deleteById(id);
-        req.flash('info', i18next.t('flash.labels.delete.success'));
-        reply.redirect('/labels');
-        return reply;
-      } catch (error) {
-        reply.send(error);
-        return reply;
-      }
+
+      await app.objection.models.label.query().deleteById(id);
+      req.flash('info', i18next.t('flash.labels.delete.success'));
+      reply.redirect('/labels');
+      return reply;
     });
 };

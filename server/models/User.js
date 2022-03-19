@@ -14,7 +14,7 @@ export default class User extends unique(Model) {
   }
 
   static relationMappings = {
-    taskCreator: {
+    createdTasks: {
       relation: Model.HasManyRelation,
       modelClass: path.join(__dirname, 'Task.js'),
       join: {
@@ -22,7 +22,7 @@ export default class User extends unique(Model) {
         to: 'tasks.creator_id',
       },
     },
-    taskExecutor: {
+    executedTasks: {
       relation: Model.HasManyRelation,
       modelClass: path.join(__dirname, 'Task.js'),
       join: {

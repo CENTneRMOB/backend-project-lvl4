@@ -16,19 +16,14 @@ export default (app) => {
     })
     .get('/users/:id/edit', { name: 'editUser', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      if (req.user.id === Number(id)) {
-        try {
-          const user = await app.objection.models.user.query().findById(id);
-          reply.render('users/edit', { user });
-          return reply;
-        } catch (error) {
-          reply.send(error);
-          return reply;
-        }
+      if (req.user.id !== Number(id)) {
+        req.flash('error', i18next.t('flash.users.permissionDenied'));
+        reply.redirect(app.reverse('users'));
+        return reply;
       }
 
-      req.flash('error', i18next.t('flash.users.edit.wrongAuth'));
-      reply.redirect(app.reverse('users'));
+      const user = await app.objection.models.user.query().findById(id);
+      reply.render('users/edit', { user });
       return reply;
     })
     .post('/users', { name: 'createUser' }, async (req, reply) => {
@@ -45,12 +40,16 @@ export default (app) => {
       }
     })
     .patch('/users/:id', { name: 'updateUser', preValidation: app.authenticate }, async (req, reply) => {
-      const updatedUser = req.body.data;
       const { id } = req.params;
-      const user = await app.objection.models.user.query().findById(id);
+      if (req.user.id !== Number(id)) {
+        req.flash('error', i18next.t('flash.users.permissionDenied'));
+        reply.redirect(app.reverse('users'));
+        return reply;
+      }
 
+      const user = await app.objection.models.user.query().findById(id);
       try {
-        await user.$query().patch(updatedUser);
+        await user.$query().patch(req.body.data);
         req.flash('info', i18next.t('flash.users.edit.success'));
 
         reply.redirect(app.reverse('users'));
@@ -63,28 +62,32 @@ export default (app) => {
     })
     .delete('/users/:id', { name: 'deleteUser', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const { taskCreator, taskExecutor } = await app.objection.models.user.query().findById(id).withGraphJoined('[taskCreator, taskExecutor]');
-      if (taskCreator.length !== 0 || taskExecutor.length !== 0) {
+      if (req.user.id !== Number(id)) {
+        req.flash('error', i18next.t('flash.users.permissionDenied'));
+        reply.redirect(app.reverse('users'));
+        return reply;
+      }
+
+      const { createdTasks, executedTasks } = await app.objection.models.user.query()
+        .findById(id)
+        .withGraphJoined('[createdTasks, executedTasks]');
+
+      if (createdTasks.length !== 0 || executedTasks.length !== 0) {
         req.flash('error', i18next.t('flash.users.delete.error'));
         reply.redirect(app.reverse('users'));
         return reply;
       }
-      if (req.user.id === Number(id)) {
-        try {
-          req.logout();
-          await app.objection.models.user.query().deleteById(id);
-          req.flash('info', i18next.t('flash.users.delete.success'));
-          reply.redirect(app.reverse('users'));
-          return reply;
-        } catch (error) {
-          req.flash('error', i18next.t('flash.users.delete.error'));
-          reply.redirect(app.reverse('users'));
-          return reply;
-        }
-      }
 
-      req.flash('error', i18next.t('flash.users.delete.wrongAuth'));
-      reply.redirect(app.reverse('users'));
-      return reply;
+      try {
+        await app.objection.models.user.query().deleteById(id);
+        req.logout();
+        req.flash('info', i18next.t('flash.users.delete.success'));
+        reply.redirect(app.reverse('users'));
+        return reply;
+      } catch (error) {
+        req.flash('error', i18next.t('flash.users.delete.error'));
+        reply.redirect(app.reverse('users'));
+        return reply;
+      }
     });
 };

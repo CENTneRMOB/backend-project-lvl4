@@ -16,14 +16,10 @@ export default (app) => {
     })
     .get('/statuses/:id/edit', { name: 'editStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      try {
-        const status = await app.objection.models.status.query().findById(id);
-        reply.render('statuses/edit', { status });
-        return reply;
-      } catch (error) {
-        reply.send(error);
-        return reply;
-      }
+
+      const status = await app.objection.models.status.query().findById(id);
+      reply.render('statuses/edit', { status });
+      return reply;
     })
     .post('/statuses', { name: 'createStatus', preValidation: app.authenticate }, async (req, reply) => {
       try {
@@ -39,12 +35,11 @@ export default (app) => {
       }
     })
     .patch('/statuses/:id', { name: 'updateStatus', preValidation: app.authenticate }, async (req, reply) => {
-      const inputData = req.body.data;
       const { id } = req.params;
       const status = await app.objection.models.status.query().findById(id);
 
       try {
-        await status.$query().patch(inputData);
+        await status.$query().patch(req.body.data);
         req.flash('info', i18next.t('flash.statuses.edit.success'));
 
         reply.redirect(app.reverse('statuses'));
@@ -57,22 +52,19 @@ export default (app) => {
     })
     .delete('/statuses/:id', { name: 'deleteStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const userId = req.user.id;
-      const { taskStatus } = await app.objection.models.status.query().findById(id).withGraphJoined('[taskStatus]');
-      if (!userId || taskStatus.length !== 0) {
+      const { statusTasks } = await app.objection.models.status.query()
+        .findById(id)
+        .withGraphJoined('statusTasks');
+
+      if (statusTasks.length !== 0) {
         req.flash('error', i18next.t('flash.statuses.delete.error'));
         reply.redirect(app.reverse('statuses'));
         return reply;
       }
 
-      try {
-        await app.objection.models.status.query().deleteById(id);
-        req.flash('info', i18next.t('flash.statuses.delete.success'));
-        reply.redirect(app.reverse('statuses'));
-        return reply;
-      } catch (error) {
-        reply.send(error);
-        return reply;
-      }
+      await app.objection.models.status.query().deleteById(id);
+      req.flash('info', i18next.t('flash.statuses.delete.success'));
+      reply.redirect(app.reverse('statuses'));
+      return reply;
     });
 };

@@ -27,5 +27,5 @@ block content
             +list(task.labels)
         .row.p-1
           .col
-            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.edit.confirm')
-            +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-link" value=t('views.tasks.delete.confirm'))
+            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.edit.submit')
+            +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-link" value=t('views.tasks.delete.submit'))

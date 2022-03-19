@@ -34,5 +34,5 @@ block content
           td= task.executor ? `${task.executor.firstName} ${task.executor.lastName}` :  ''
           td= formatDate(task.createdAt)
           td
-            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.edit.confirm')
-            +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-link" value=t('views.tasks.delete.confirm'))
+            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.edit.submit')
+            +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-link" value=t('views.tasks.delete.submit'))

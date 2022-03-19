@@ -9,7 +9,7 @@ export default class Status extends Model {
   }
 
   static relationMappings = {
-    taskStatus: {
+    statusTasks: {
       relation: Model.HasManyRelation,
       modelClass: path.join(__dirname, 'Task.js'),
       join: {
