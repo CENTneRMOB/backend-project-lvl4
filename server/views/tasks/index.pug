@@ -24,7 +24,7 @@ block content
         th= t('views.tasks.createdAt')
         th
     tbody
-      each task in filteredTasks
+      each task in filteredTasks || tasks
         tr
           td= task.id
           td

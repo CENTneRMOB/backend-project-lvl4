@@ -10,6 +10,13 @@ export default (app) => {
       const users = await app.objection.models.user.query();
       const labels = await app.objection.models.label.query();
 
+      if (Object.keys(req.query).length === 0) {
+        reply.render('tasks/index', {
+          tasks, statuses, users, labels,
+        });
+        return reply;
+      }
+
       const queryParams = Object.entries(req.query)
         .filter(([, value]) => value)
         .map(([param, value]) => {
@@ -62,7 +69,10 @@ export default (app) => {
     })
     .get('/tasks/:id', { name: 'task', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status, labels]');
+      const task = await app.objection.models.task.query()
+        .findById(id)
+        .withGraphJoined('[creator, executor, status, labels]');
+
       reply.render('tasks/view', { task });
       return reply;
     })
@@ -72,7 +82,10 @@ export default (app) => {
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
       const labels = await app.objection.models.label.query();
-      const task = await app.objection.models.task.query().findById(id).withGraphJoined('[creator, executor, status, labels]');
+      const task = await app.objection.models.task.query()
+        .findById(id)
+        .withGraphJoined('[creator, executor, status, labels]');
+
       reply.render('tasks/edit', {
         task, statuses, users, labels,
       });
@@ -188,6 +201,7 @@ export default (app) => {
     .delete('/tasks/:id', { name: 'deleteTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const task = await app.objection.models.task.query().findById(id);
+
       if (req.user.id !== Number(task.creatorId)) {
         req.flash('error', i18next.t('flash.tasks.delete.error'));
         reply.redirect(app.reverse('tasks'));
