@@ -56,14 +56,14 @@
       "qs": "^6.10.3",
       "rollbar": "^2.24.0",
       "sqlite3": "^5.0.2",
-      "webpack": "^5.70.0"
+      "webpack": "^5.70.0",
+      "dotenv": "^16.0.0"
    },
    "devDependencies": {
       "@jest/globals": "^27.5.1",
       "@types/jest": "^27.4.1",
       "@types/node": "^17.0.23",
       "css-loader": "^6.7.1",
-      "dotenv": "^16.0.0",
       "eslint": "^8.11.0",
       "eslint-config-airbnb-base": "^15.0.0",
       "eslint-plugin-import": "^2.25.4",
