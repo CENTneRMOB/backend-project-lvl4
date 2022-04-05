@@ -9,7 +9,7 @@ export default class Label extends Model {
   }
 
   static relationMappings = {
-    labeledTasks: {
+    tasks: {
       relation: Model.ManyToManyRelation,
       modelClass: path.join(__dirname, 'Task.js'),
       join: {

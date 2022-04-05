@@ -5,55 +5,27 @@ import i18next from 'i18next';
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
-      const tasks = await app.objection.models.task.query().withGraphJoined('[creator, executor, status, labels]');
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
       const labels = await app.objection.models.label.query();
 
-      if (Object.keys(req.query).length === 0) {
-        reply.render('tasks/index', {
-          tasks, statuses, users, labels,
-        });
-        return reply;
-      }
+      const params = req.query;
 
-      const queryParams = Object.entries(req.query)
-        .filter(([, value]) => value)
-        .map(([param, value]) => {
-          if (!Number(value)) {
-            return ['creator', req.user.id];
-          }
-          return [param, Number(value)];
-        });
-
-      const objectQueryParams = Object.fromEntries(queryParams);
       const {
-        status, executor, label, creator,
-      } = objectQueryParams;
+        status,
+        executor,
+        label,
+        isCreatorUser,
+      } = params;
 
-      let filteredTasks = tasks;
-      if (status) {
-        filteredTasks = filteredTasks
-          .filter((task) => task.status.id === status);
-      }
-      if (executor) {
-        filteredTasks = filteredTasks
-          .filter((task) => task.executor && task.executor.id === executor);
-      }
-      if (creator) {
-        filteredTasks = filteredTasks
-          .filter((task) => task.creator.id === creator);
-      }
-      if (label) {
-        filteredTasks = filteredTasks
-          .filter((task) => task.labels
-            .flat()
-            .map((labelItem) => Object.entries(labelItem))
-            .flat(2).includes(label));
-      }
+      const tasks = await app.objection.models.task.query()
+        .modify('byStatus', status)
+        .modify('byExecutor', executor)
+        .modify('byCreator', isCreatorUser, req.user.id)
+        .modify('byLabel', label, app.objection);
 
       reply.render('tasks/index', {
-        filteredTasks, statuses, users, labels, objectQueryParams,
+        tasks, statuses, users, labels, params,
       });
       return reply;
     })
@@ -101,33 +73,33 @@ export default (app) => {
           labels,
         } = req.body.data;
 
-        let labelsData;
+        const [...labelsFromDB] = !labels ? [] : await app.objection.models.label.query()
+          .findByIds(labels);
 
-        if (typeof labels === 'string') {
-          labelsData = labels;
-        } else {
-          labelsData = !labels ? '' : labels.join(',');
-        }
+        const labelsIds = labelsFromDB.map((label) => label.id);
 
-        const dataObj = {
+        const newTask = {
           name,
           description,
           statusId: Number(statusId),
-          executorId: executorId.length === 0 ? null : Number(executorId),
+          executorId: !executorId ? null : Number(executorId),
           creatorId: req.user.id,
-          labelsId: labelsData,
+          labelsId: labelsIds,
         };
 
-        const task = await app.objection.models.task.fromJson(dataObj);
-        await app.objection.models.task.query().insert(task);
+        const Task = await app.objection.models.task;
+        const task = await Task.fromJson(newTask);
 
-        const labelsArray = labelsData.split(',');
-
-        labelsArray.forEach(async (labelId) => {
-          const object = { taskId: task.id, labelId: Number(labelId) };
-
-          await app.objection.models.tasklabel.query().insert(object);
-        });
+        await Task.query().insert(task);
+        if (labelsIds.length !== 0) {
+          await Task.relatedQuery('labels')
+            .for(
+              Task.query()
+                .where('id', task.id)
+                .limit(1),
+            )
+            .relate(labelsIds);
+        }
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
@@ -154,35 +126,39 @@ export default (app) => {
           labels,
         } = req.body.data;
 
-        let labelsData;
-        if (typeof labels === 'string') {
-          labelsData = labels.length === 0 ? '' : labels;
-        } else {
-          labelsData = !labels ? '' : labels.join(',');
-        }
+        const [...labelsFromDB] = !labels ? [] : await app.objection.models.label.query()
+          .findByIds(labels);
 
-        const dataObj = {
+        const labelsIds = labelsFromDB.map((label) => label.id);
+
+        const taskUpdate = {
           name,
           description,
           statusId: Number(statusId),
-          executorId: executorId.length === 0 ? null : Number(executorId),
+          executorId: !executorId ? null : Number(executorId),
           creatorId: req.user.id,
-          labelsId: labelsData,
+          labelsId: labelsIds,
         };
 
         const { id } = req.params;
-        const task = await app.objection.models.task.query().findById(id).withGraphJoined('labels');
-        await app.objection.models.tasklabel.query().delete().where('task_id', '=', task.id);
+        const Task = await app.objection.models.task;
+        const task = await Task.query().findById(id);
+        await task.$query().patch(taskUpdate);
 
-        const labelsArray = labelsData.split(',');
+        if (labelsIds.length !== 0) {
+          await Task.relatedQuery('labels')
+            .for(id)
+            .unrelate();
 
-        labelsArray.forEach(async (labelId) => {
-          const object = { taskId: Number(id), labelId: Number(labelId) };
+          await Task.relatedQuery('labels')
+            .for(
+              Task.query()
+                .where('id', task.id)
+                .limit(1),
+            )
+            .relate(labelsIds);
+        }
 
-          await app.objection.models.tasklabel.query().insert(object);
-        });
-
-        await task.$query().patch(dataObj);
         req.flash('info', i18next.t('flash.tasks.edit.success'));
         reply.redirect(app.reverse('tasks'));
         return reply;
@@ -208,8 +184,13 @@ export default (app) => {
         return reply;
       }
 
-      await app.objection.models.task.query().deleteById(id);
-      await app.objection.models.tasklabel.query().delete().where('task_id', '=', id);
+      const Task = app.objection.models.task;
+
+      await Task.relatedQuery('labels')
+        .for(id)
+        .unrelate();
+      await Task.query().deleteById(id);
+
       req.flash('info', i18next.t('flash.tasks.delete.success'));
       reply.redirect(app.reverse('tasks'));
       return reply;

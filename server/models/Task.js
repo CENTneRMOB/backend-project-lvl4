@@ -8,6 +8,34 @@ export default class Task extends Model {
     return 'tasks';
   }
 
+  static get modifiers() {
+    return {
+      byStatus(query, statusId) {
+        if (statusId) {
+          query.where('statusId', Number(statusId));
+        }
+      },
+
+      byExecutor(query, executorId) {
+        if (executorId) {
+          query.where('executorId', Number(executorId));
+        }
+      },
+
+      byCreator(query, isCreator, creatorId) {
+        if (isCreator) {
+          query.where('creatorId', Number(creatorId));
+        }
+      },
+
+      byLabel(query, labelId, objection) {
+        if (labelId) {
+          query.whereExists(objection.knex('tasks_labels').whereRaw('label_id = ?', labelId).whereRaw('tasks_labels.task_id = tasks.id'));
+        }
+      },
+    };
+  }
+
   static relationMappings = {
     creator: {
       relation: Model.BelongsToOneRelation,

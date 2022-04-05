@@ -52,11 +52,11 @@ export default (app) => {
     })
     .delete('/statuses/:id', { name: 'deleteStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const { statusTasks } = await app.objection.models.status.query()
+      const { tasks } = await app.objection.models.status.query()
         .findById(id)
-        .withGraphJoined('statusTasks');
+        .withGraphJoined('tasks');
 
-      if (statusTasks.length !== 0) {
+      if (tasks.length !== 0) {
         req.flash('error', i18next.t('flash.statuses.delete.error'));
         reply.redirect(app.reverse('statuses'));
         return reply;

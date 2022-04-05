@@ -52,11 +52,11 @@ export default (app) => {
     })
     .delete('/labels/:id', { name: 'deleteLabel', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const { labeledTasks } = await app.objection.models.label.query()
+      const { tasks } = await app.objection.models.label.query()
         .findById(id)
-        .withGraphJoined('labeledTasks');
+        .withGraphJoined('tasks');
 
-      if (labeledTasks.length !== 0) {
+      if (tasks.length !== 0) {
         req.flash('error', i18next.t('flash.labels.delete.error'));
         reply.redirect('/labels');
         return reply;

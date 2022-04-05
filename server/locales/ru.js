@@ -158,6 +158,8 @@ module.exports = {
           submit: 'Удалить',
         },
         filter: {
+          executorId: 'Исполнитель',
+          statusId: 'Статус',
           label: 'Метка',
           isCreatorUser: 'Только мои задачи',
           show: 'Показать',

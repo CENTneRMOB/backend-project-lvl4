@@ -5,18 +5,15 @@
 -     return entity[`${propertyName}`] === item.id;   
 -   }
 -   if (entity.labelsId) {
--     if (typeof entity.labelsId === 'number') {
--       return entity.labelsId === item.id;
--     }
-- 
--     const labels = entity.labelsId.split(',').map((id) => Number(id));
+-     const strigifiedLabels = entity.labelsId.slice(1, -1);
+-     const labels = !strigifiedLabels ? [] :  strigifiedLabels.split(',').map((id) => Number(id.slice(1, -1)));
 -     return labels.includes(item.id);
 -   }
 -
 -   return false;
 - }
 - const isSelectedFilter = (item, queryParams, itemType) => {
--   if (_.has(queryParams, itemType) && item.id === queryParams[itemType]) {
+-   if (_.has(queryParams, itemType) && item.id == queryParams[itemType]) {
 -     return true;
 -   }
 -   return false;
@@ -60,10 +57,9 @@ mixin textarea(entity, propertyName, errors = {}, entityType)
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
-mixin select(entity, items, propertyName, errors = {}, entityType)
+mixin select(entity, items, propertyName, errors = {}, entityType, multiple = false)
   - propertyErrors = _.get(errors, propertyName)
   - classLine = 'form-control' + (_.isEmpty(errors) ? '' : ' is-invalid')
-  - multiple = propertyName === 'labels' ? 'multiple' : false
   - inputId = getInputId(propertyName)
   .mb-3(class=(errors[propertyName] && 'has-danger'))
     label(
@@ -102,7 +98,7 @@ mixin list(items)
 mixin checkbox(name, queryParams = {})
   - inputId = getInputId(name)
   input(id=inputId class='form-check-input' type='checkbox' name=name checked=(
-    _.has(queryParams, 'creator') ? 'on' : false
+    _.has(queryParams, 'isCreatorUser') ? 'on' : false
   ))
   label(class= 'form-check-label' for= inputId)= t(`views.tasks.filter.${name}`)
 
@@ -113,7 +109,7 @@ mixin filterSelect(items, propertyName, itemType, queryParams = {})
       .m-3
         label(
           for= inputId
-        )= t(`views.tasks.${propertyName}`)
+        )= t(`views.tasks.filter.${propertyName}`)
         select(
           id= inputId
           name=itemType

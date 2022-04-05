@@ -5,12 +5,12 @@ block content
   .card-body.p-2.bg-light
     +formFor()(action=route('tasks') method='get')
       .row
-        +filterSelect(statuses, 'statusId', 'status', objectQueryParams)
-        +filterSelect(users, 'executorId', 'executor', objectQueryParams)
-        +filterSelect(labels, 'label', 'label', objectQueryParams)
+        +filterSelect(statuses, 'statusId', 'status', params)
+        +filterSelect(users, 'executorId', 'executor', params)
+        +filterSelect(labels, 'label', 'label', params)
               
       .mb-3.form-check
-        +checkbox('isCreatorUser', objectQueryParams)
+        +checkbox('isCreatorUser', params)
       +submit()(value= t('views.tasks.filter.show'))
       
   table.table.table-striped
@@ -24,14 +24,17 @@ block content
         th= t('views.tasks.createdAt')
         th
     tbody
-      each task in filteredTasks || tasks
+      each task in tasks
         tr
           td= task.id
           td
             a(href=`/tasks/${task.id}`)= task.name
-          td= task.status.name
-          td= `${task.creator.firstName} ${task.creator.lastName}`
-          td= task.executor ? `${task.executor.firstName} ${task.executor.lastName}` :  ''
+          td= _.find(statuses, { id: task.statusId }).name
+
+          - const getFullName = (user) => `${user.firstName} ${user.lastName}`;
+
+          td= getFullName(_.find(users, { id: task.creatorId }))
+          td= !task.executorId ? '' : getFullName(_.find(users, { id: task.executorId }))
           td= formatDate(task.createdAt)
           td
             a(href=`/tasks/${task.id}/edit`)= t('views.tasks.edit.submit')
