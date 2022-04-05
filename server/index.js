@@ -1,5 +1,6 @@
 // @ts-check
 
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 import fastify from 'fastify';
@@ -20,13 +21,15 @@ import i18next from 'i18next';
 import Rollbar from 'rollbar';
 import ru from './locales/ru.js';
 // @ts-ignore
-import webpackConfig from '../webpack.config.babel.js';
+import webpackConfig from '../webpack.config.js';
 
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
 import knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
+
+const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
 dotenv.config();
 const mode = process.env.NODE_ENV || 'development';

@@ -1,7 +1,10 @@
-// @ts-check
+// @ts-nocheck
 
 import { Model } from 'objection';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
 export default class Label extends Model {
   static get tableName() {

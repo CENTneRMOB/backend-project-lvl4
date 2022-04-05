@@ -3,7 +3,7 @@
 import { describe } from '@jest/globals';
 import _ from 'lodash';
 import getApp from '../server/index.js';
-import encrypt from '../server/lib/secure.js';
+import encrypt from '../server/lib/secure.cjs';
 import { getTestData, prepareData, signIn } from './helpers/index.js';
 
 describe('test users CRUD', () => {

@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const getFixturePath = (filename) => path.join(__dirname, '..', '..', '__fixtures__', filename);
+const getFixturePath = (filename) => path.join('..', '..', '__fixtures__', filename);
 const readFixture = (filename) => fs.readFileSync(getFixturePath(filename), 'utf-8').trim();
 const getFixtureData = (filename) => JSON.parse(readFixture(filename));
 

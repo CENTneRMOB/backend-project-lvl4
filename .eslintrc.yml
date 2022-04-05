@@ -2,11 +2,12 @@
 
 root: true
 
+parserOptions:
+  ecmaVersion: latest
+
 extends:
   - 'airbnb-base'
   - 'plugin:jest/recommended'
-
-parser: babel-eslint
 
 env:
   browser: true
@@ -25,3 +26,4 @@ rules:
       ignorePropertyModificationsFor:
       - req
       - reply
+  no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }]
