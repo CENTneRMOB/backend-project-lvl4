@@ -1,6 +1,7 @@
 // @ts-check
 
 import { describe } from '@jest/globals';
+import fastify from 'fastify';
 import _ from 'lodash';
 import getApp from '../server/index.js';
 import encrypt from '../server/lib/secure.cjs';
@@ -13,17 +14,19 @@ describe('test users CRUD', () => {
   const testData = getTestData();
 
   beforeAll(async () => {
-    app = await getApp();
+    app = fastify({ logger: { prettyPrint: true } });
+    await getApp();
     knex = app.objection.knex;
     models = app.objection.models;
-  });
-
-  beforeEach(async () => {
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
+    // @ts-ignore
     await knex.migrate.latest();
     await prepareData(app);
+  });
+
+  beforeEach(async () => {
   });
 
   describe('positive cases', () => {
@@ -210,10 +213,10 @@ describe('test users CRUD', () => {
 
   afterEach(async () => {
     // после каждого теста откатываем миграции
-    await knex.migrate.rollback();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
+    await knex.migrate.rollback();
     app.close();
   });
 });

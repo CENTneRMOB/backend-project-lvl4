@@ -1,12 +1,9 @@
 // @ts-check
 
-import { Model } from 'objection';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const path = require('path');
+const BaseModel = require('./BaseModel.cjs');
 
-const __dirname = fileURLToPath(path.dirname(import.meta.url));
-
-export default class Task extends Model {
+module.exports = class Task extends BaseModel {
   static get tableName() {
     return 'tasks';
   }
@@ -41,32 +38,32 @@ export default class Task extends Model {
 
   static relationMappings = {
     creator: {
-      relation: Model.BelongsToOneRelation,
-      modelClass: path.join(__dirname, 'User.js'),
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: path.join(__dirname, 'User.cjs'),
       join: {
         from: 'tasks.creator_id',
         to: 'users.id',
       },
     },
     executor: {
-      relation: Model.BelongsToOneRelation,
-      modelClass: path.join(__dirname, 'User.js'),
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: path.join(__dirname, 'User.cjs'),
       join: {
         from: 'tasks.executor_id',
         to: 'users.id',
       },
     },
     status: {
-      relation: Model.BelongsToOneRelation,
-      modelClass: path.join(__dirname, 'Status.js'),
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: path.join(__dirname, 'Status.cjs'),
       join: {
         from: 'tasks.status_id',
         to: 'statuses.id',
       },
     },
     labels: {
-      relation: Model.ManyToManyRelation,
-      modelClass: path.join(__dirname, 'Label.js'),
+      relation: BaseModel.ManyToManyRelation,
+      modelClass: path.join(__dirname, 'Label.cjs'),
       join: {
         from: 'tasks.id',
         through: {
@@ -76,7 +73,7 @@ export default class Task extends Model {
         to: 'labels.id',
       },
     },
-  }
+  };
 
   static get jsonSchema() {
     return {
@@ -93,4 +90,4 @@ export default class Task extends Model {
       },
     };
   }
-}
+};

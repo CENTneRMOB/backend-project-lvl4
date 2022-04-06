@@ -1,5 +1,6 @@
 // @ts-check
 
+import fastify from 'fastify';
 import getApp from '../server/index.js';
 import { getTestData, prepareData, signIn } from './helpers/index.js';
 
@@ -14,19 +15,21 @@ describe('test labels CRUD', () => {
   const testData = getTestData();
 
   beforeAll(async () => {
-    app = await getApp();
+    app = fastify({ logger: { prettyPrint: true } });
+    await getApp();
     knex = app.objection.knex;
     models = app.objection.models;
     user = testData.users.existing;
     labelParams = testData.labels.existing;
-  });
-
-  beforeEach(async () => {
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
+    // @ts-ignore
     await knex.migrate.latest();
     await prepareData(app);
+  });
+
+  beforeEach(async () => {
     cookies = await signIn(app, user);
     const existingLabel = await models.label.query().findOne({ name: labelParams.name });
     labelId = existingLabel.id;
@@ -202,10 +205,10 @@ describe('test labels CRUD', () => {
 
   afterEach(async () => {
     // после каждого теста откатываем миграции
-    await knex.migrate.rollback();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
+    await knex.migrate.rollback();
     app.close();
   });
 });

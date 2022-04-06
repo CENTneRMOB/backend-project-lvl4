@@ -1,26 +1,23 @@
 // @ts-check
 
-import { Model } from 'objection';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const path = require('path');
+const BaseModel = require('./BaseModel.cjs');
 
-const __dirname = fileURLToPath(path.dirname(import.meta.url));
-
-export default class Status extends Model {
+module.exports = class Status extends BaseModel {
   static get tableName() {
     return 'statuses';
   }
 
   static relationMappings = {
     tasks: {
-      relation: Model.HasManyRelation,
-      modelClass: path.join(__dirname, 'Task.js'),
+      relation: BaseModel.HasManyRelation,
+      modelClass: path.join(__dirname, 'Task.cjs'),
       join: {
         from: 'statuses.id',
         to: 'tasks.status_id',
       },
     },
-  }
+  };
 
   static get jsonSchema() {
     return {
@@ -32,4 +29,4 @@ export default class Status extends Model {
       },
     };
   }
-}
+};
