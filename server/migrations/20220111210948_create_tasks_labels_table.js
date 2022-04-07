@@ -1,6 +1,6 @@
 // @ts-check
 
-exports.up = (knex) => (
+export const up = (knex) => (
   knex.schema.createTable('tasks_labels', (table) => {
     table.increments('id').primary();
     table.integer('task_id').references('tasks.id');
@@ -8,4 +8,4 @@ exports.up = (knex) => (
   })
 );
 
-exports.down = (knex) => knex.schema.dropTable('tasks_labels');
+export const down = (knex) => knex.schema.dropTable('tasks_labels');

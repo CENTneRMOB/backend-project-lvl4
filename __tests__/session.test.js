@@ -1,6 +1,5 @@
 // @ts-check
 
-import fastify from 'fastify';
 import getApp from '../server/index.js';
 import { getTestData, prepareData } from './helpers/index.js';
 
@@ -10,8 +9,8 @@ describe('test session', () => {
   let testData;
 
   beforeAll(async () => {
-    app = fastify({ logger: { prettyPrint: true } });
-    await getApp();
+    // app = fastify({ logger: { prettyPrint: true } });
+    app = await getApp();
     knex = app.objection.knex;
     console.log('!!!!!!!!!!!!!!!!!!!!!!!!', app.objection);
     // @ts-ignore

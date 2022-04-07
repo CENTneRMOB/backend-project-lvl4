@@ -1,7 +1,6 @@
 // @ts-check
 
 import { describe } from '@jest/globals';
-import fastify from 'fastify';
 import _ from 'lodash';
 import getApp from '../server/index.js';
 import encrypt from '../server/lib/secure.cjs';
@@ -14,8 +13,8 @@ describe('test users CRUD', () => {
   const testData = getTestData();
 
   beforeAll(async () => {
-    app = fastify({ logger: { prettyPrint: true } });
-    await getApp();
+    // app = fastify({ logger: { prettyPrint: true } });
+    app = await getApp();
     knex = app.objection.knex;
     models = app.objection.models;
     // тесты не должны зависеть друг от друга

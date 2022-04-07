@@ -1,6 +1,6 @@
 // @ts-check
 
-exports.up = (knex) => (
+export const up = (knex) => (
   knex.schema.createTable('statuses', (table) => {
     table.increments('id').primary();
     table.string('name').notNullable();
@@ -8,4 +8,4 @@ exports.up = (knex) => (
   })
 );
 
-exports.down = (knex) => knex.schema.dropTable('statuses');
+export const down = (knex) => knex.schema.dropTable('statuses');
