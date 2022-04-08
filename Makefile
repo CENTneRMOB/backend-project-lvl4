@@ -16,10 +16,10 @@ start:
 	heroku local -f Procfile.dev
 
 start-backend:
-	npm start -- --watch --verbose-watch --ignore-watch='node_modules .git .sqlite'
+	npx nodemon server/bin/server.js
 
 start-frontend:
-	npx webpack --watch --progress
+	npx webpack serve
 
 lint:
 	npx eslint .

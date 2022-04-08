@@ -13,14 +13,12 @@ describe('test users CRUD', () => {
   const testData = getTestData();
 
   beforeAll(async () => {
-    // app = fastify({ logger: { prettyPrint: true } });
     app = await getApp();
     knex = app.objection.knex;
     models = app.objection.models;
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
-    // @ts-ignore
     await knex.migrate.latest();
     await prepareData(app);
   });
@@ -210,12 +208,7 @@ describe('test users CRUD', () => {
     });
   });
 
-  afterEach(async () => {
-    // после каждого теста откатываем миграции
-  });
-
   afterAll(async () => {
-    await knex.migrate.rollback();
     app.close();
   });
 });

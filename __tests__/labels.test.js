@@ -14,7 +14,6 @@ describe('test labels CRUD', () => {
   const testData = getTestData();
 
   beforeAll(async () => {
-    // app = fastify({ logger: { prettyPrint: true } });
     app = await getApp();
     knex = app.objection.knex;
     models = app.objection.models;
@@ -202,12 +201,7 @@ describe('test labels CRUD', () => {
     });
   });
 
-  afterEach(async () => {
-    // после каждого теста откатываем миграции
-  });
-
   afterAll(async () => {
-    await knex.migrate.rollback();
     app.close();
   });
 });
