@@ -1,17 +1,17 @@
-// @ts-check
+// @ts-nocheck
 
-import { Model } from 'objection';
-import path from 'path';
+const path = require('path');
+const BaseModel = require('./BaseModel.cjs');
 
-export default class Label extends Model {
+module.exports = class Label extends BaseModel {
   static get tableName() {
     return 'labels';
   }
 
   static relationMappings = {
     tasks: {
-      relation: Model.ManyToManyRelation,
-      modelClass: path.join(__dirname, 'Task.js'),
+      relation: BaseModel.ManyToManyRelation,
+      modelClass: path.join(__dirname, 'Task.cjs'),
       join: {
         from: 'labels.id',
         through: {
@@ -21,7 +21,7 @@ export default class Label extends Model {
         to: 'tasks.id',
       },
     },
-  }
+  };
 
   static get jsonSchema() {
     return {
@@ -33,4 +33,4 @@ export default class Label extends Model {
       },
     };
   }
-}
+};

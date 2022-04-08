@@ -19,14 +19,14 @@ describe('test tasks CRUD', () => {
     models = app.objection.models;
     user = testData.users.existing;
     taskParams = testData.tasks.existing;
-  });
-
-  beforeEach(async () => {
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
+  });
+
+  beforeEach(async () => {
     cookies = await signIn(app, user);
     const existingTask = await models.task.query().findOne({ name: taskParams.name });
     taskId = existingTask.id;
@@ -210,12 +210,7 @@ describe('test tasks CRUD', () => {
     });
   });
 
-  afterEach(async () => {
-    // после каждого теста откатываем миграции
-    await knex.migrate.rollback();
-  });
-
-  afterAll(() => {
+  afterAll(async () => {
     app.close();
   });
 });

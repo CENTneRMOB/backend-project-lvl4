@@ -19,14 +19,15 @@ describe('test labels CRUD', () => {
     models = app.objection.models;
     user = testData.users.existing;
     labelParams = testData.labels.existing;
-  });
-
-  beforeEach(async () => {
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
+    // @ts-ignore
     await knex.migrate.latest();
     await prepareData(app);
+  });
+
+  beforeEach(async () => {
     cookies = await signIn(app, user);
     const existingLabel = await models.label.query().findOne({ name: labelParams.name });
     labelId = existingLabel.id;
@@ -200,12 +201,7 @@ describe('test labels CRUD', () => {
     });
   });
 
-  afterEach(async () => {
-    // после каждого теста откатываем миграции
-    await knex.migrate.rollback();
-  });
-
-  afterAll(() => {
+  afterAll(async () => {
     app.close();
   });
 });

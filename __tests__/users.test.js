@@ -3,7 +3,7 @@
 import { describe } from '@jest/globals';
 import _ from 'lodash';
 import getApp from '../server/index.js';
-import encrypt from '../server/lib/secure.js';
+import encrypt from '../server/lib/secure.cjs';
 import { getTestData, prepareData, signIn } from './helpers/index.js';
 
 describe('test users CRUD', () => {
@@ -16,14 +16,14 @@ describe('test users CRUD', () => {
     app = await getApp();
     knex = app.objection.knex;
     models = app.objection.models;
-  });
-
-  beforeEach(async () => {
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
+  });
+
+  beforeEach(async () => {
   });
 
   describe('positive cases', () => {
@@ -208,12 +208,7 @@ describe('test users CRUD', () => {
     });
   });
 
-  afterEach(async () => {
-    // после каждого теста откатываем миграции
-    await knex.migrate.rollback();
-  });
-
-  afterAll(() => {
+  afterAll(async () => {
     app.close();
   });
 });

@@ -19,14 +19,14 @@ describe('test statuses CRUD', () => {
     models = app.objection.models;
     user = testData.users.existing;
     statusParams = testData.statuses.existing;
-  });
-
-  beforeEach(async () => {
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
+  });
+
+  beforeEach(async () => {
     cookies = await signIn(app, user);
     const existingStatus = await models.status.query().findOne({ name: statusParams.name });
     statusId = existingStatus.id;
@@ -201,12 +201,7 @@ describe('test statuses CRUD', () => {
     });
   });
 
-  afterEach(async () => {
-    // после каждого теста откатываем миграции
-    await knex.migrate.rollback();
-  });
-
-  afterAll(() => {
+  afterAll(async () => {
     app.close();
   });
 });

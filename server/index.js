@@ -1,5 +1,6 @@
 // @ts-check
 
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 import fastify from 'fastify';
@@ -19,14 +20,14 @@ import Pug from 'pug';
 import i18next from 'i18next';
 import Rollbar from 'rollbar';
 import ru from './locales/ru.js';
-// @ts-ignore
-import webpackConfig from '../webpack.config.babel.js';
 
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
-import knexConfig from '../knexfile.js';
+import * as knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
+
+const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
 dotenv.config();
 const mode = process.env.NODE_ENV || 'development';
@@ -34,9 +35,6 @@ const isProduction = mode === 'production';
 const isDevelopment = mode === 'development';
 
 const setUpViews = (app) => {
-  const { devServer } = webpackConfig;
-  const devHost = `http://${devServer.host}:${devServer.port}`;
-  const domain = isDevelopment ? devHost : '';
   const helpers = getHelpers(app);
   app.register(pointOfView, {
     engine: {
@@ -45,7 +43,7 @@ const setUpViews = (app) => {
     includeViewExtension: true,
     defaultContext: {
       ...helpers,
-      assetPath: (filename) => `${domain}/assets/${filename}`,
+      assetPath: (filename) => `/assets/${filename}`,
     },
     templates: path.join(__dirname, '..', 'server', 'views'),
   });
@@ -56,9 +54,7 @@ const setUpViews = (app) => {
 };
 
 const setUpStaticAssets = (app) => {
-  const pathPublic = isProduction
-    ? path.join(__dirname, '..', 'public')
-    : path.join(__dirname, '..', 'dist', 'public');
+  const pathPublic = path.join(__dirname, '..', 'dist');
   app.register(fastifyStatic, {
     root: pathPublic,
     prefix: '/assets/',
