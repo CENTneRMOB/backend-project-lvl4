@@ -78,28 +78,23 @@ export default (app) => {
 
         const labelsIds = labelsFromDB.map((label) => label.id);
 
-        const newTask = {
-          name,
-          description,
-          statusId: Number(statusId),
-          executorId: !executorId ? null : Number(executorId),
-          creatorId: req.user.id,
-          labelsId: labelsIds,
-        };
-
         const Task = await app.objection.models.task;
-        const task = await Task.fromJson(newTask);
 
-        await Task.query().insert(task);
-        if (labelsIds.length !== 0) {
-          await Task.relatedQuery('labels')
-            .for(
-              Task.query()
-                .where('id', task.id)
-                .limit(1),
-            )
-            .relate(labelsIds);
-        }
+        await Task.transaction(async (trx) => {
+          await Task.query(trx).insertGraph(
+            {
+              name,
+              description,
+              statusId: Number(statusId),
+              executorId: !executorId ? null : Number(executorId),
+              creatorId: req.user.id,
+              labelsId: labelsIds,
+
+              labels: labelsIds.map((id) => ({ id })),
+            },
+            { relate: true },
+          );
+        });
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
@@ -131,33 +126,28 @@ export default (app) => {
 
         const labelsIds = labelsFromDB.map((label) => label.id);
 
-        const taskUpdate = {
-          name,
-          description,
-          statusId: Number(statusId),
-          executorId: !executorId ? null : Number(executorId),
-          creatorId: req.user.id,
-          labelsId: labelsIds,
-        };
-
         const { id } = req.params;
         const Task = await app.objection.models.task;
-        const task = await Task.query().findById(id);
-        await task.$query().patch(taskUpdate);
 
-        if (labelsIds.length !== 0) {
-          await Task.relatedQuery('labels')
-            .for(id)
-            .unrelate();
+        await Task.transaction(async (trx) => {
+          await Task.query(trx).upsertGraph(
+            {
+              id: Number(id),
+              name,
+              description,
+              statusId: Number(statusId),
+              executorId: !executorId ? null : Number(executorId),
+              creatorId: req.user.id,
+              labelsId: labelsIds,
 
-          await Task.relatedQuery('labels')
-            .for(
-              Task.query()
-                .where('id', task.id)
-                .limit(1),
-            )
-            .relate(labelsIds);
-        }
+              labels: labelsIds.map((labelId) => ({ id: labelId })),
+            },
+            {
+              relate: true,
+              unrelate: true,
+            },
+          );
+        });
 
         req.flash('info', i18next.t('flash.tasks.edit.success'));
         reply.redirect(app.reverse('tasks'));

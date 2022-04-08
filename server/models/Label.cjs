@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-check
 
 const path = require('path');
 const BaseModel = require('./BaseModel.cjs');

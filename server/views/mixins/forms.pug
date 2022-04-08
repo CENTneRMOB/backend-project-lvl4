@@ -5,8 +5,11 @@
 -     return entity[`${propertyName}`] === item.id;   
 -   }
 -   if (entity.labelsId) {
--     const strigifiedLabels = entity.labelsId.slice(1, -1);
--     const labels = !strigifiedLabels ? [] :  strigifiedLabels.split(',').map((id) => Number(id.slice(1, -1)));
+-     if (typeof entity.labelsId === 'number') {
+-       return entity.labelsId === item.id;
+-     }
+-
+-     const labels = entity.labelsId.split(',').map((id) => Number(id));
 -     return labels.includes(item.id);
 -   }
 -

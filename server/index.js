@@ -31,7 +31,6 @@ const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
 dotenv.config();
 const mode = process.env.NODE_ENV || 'development';
-const isProduction = mode === 'production';
 const isDevelopment = mode === 'development';
 
 const setUpViews = (app) => {
