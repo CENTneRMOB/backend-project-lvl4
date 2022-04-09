@@ -1,16 +1,17 @@
 // @ts-check
 
-import fastify from 'fastify';
 import {
   describe, beforeAll, it, expect,
 } from '@jest/globals';
-import init from '../server/index.js';
+
+import fastify from 'fastify';
+import init from '../server/plugin.js';
 
 describe('requests', () => {
   let app;
 
   beforeAll(async () => {
-    app = fastify({ logger: { prettyPrint: true } });
+    app = fastify({ logger: { prettyPrint: false } });
     await init(app);
   });
 
@@ -30,7 +31,7 @@ describe('requests', () => {
     expect(res.statusCode).toBe(404);
   });
 
-  afterAll(() => {
-    app.close();
+  afterAll(async () => {
+    await app.close();
   });
 });

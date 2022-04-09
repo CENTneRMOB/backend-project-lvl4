@@ -1,7 +1,7 @@
 // @ts-check
 
 import fastify from 'fastify';
-import init from '../server/index.js';
+import init from '../server/plugin.js';
 import { getTestData, prepareData } from './helpers/index.js';
 
 describe('test session', () => {
@@ -10,9 +10,8 @@ describe('test session', () => {
   let testData;
 
   beforeAll(async () => {
-    app = fastify({ logger: { prettyPrint: true } });
+    app = fastify({ logger: { prettyPrint: false } });
     await init(app);
-
     knex = app.objection.knex;
     await knex.migrate.latest();
     await prepareData(app);
@@ -54,6 +53,7 @@ describe('test session', () => {
   });
 
   afterAll(async () => {
-    app.close();
+    // await knex.migrate.rollback();
+    await app.close();
   });
 });

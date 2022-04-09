@@ -1,24 +1,23 @@
 // @ts-check
 
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 import path from 'path';
 import fastifyStatic from 'fastify-static';
 import fastifyErrorPage from 'fastify-error-page';
+
 import pointOfView from 'point-of-view';
 import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
 import fastifyPassport from 'fastify-passport';
 import fastifySensible from 'fastify-sensible';
-// import fastifyFlash from 'fastify-flash';
 import { plugin as fastifyReverseRoutes } from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
 import fastifyObjectionjs from 'fastify-objectionjs';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
-import Rollbar from 'rollbar';
 import ru from './locales/ru.js';
+// @ts-ignore
 
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
@@ -28,9 +27,8 @@ import FormStrategy from './lib/passportStrategies/FormStrategy.js';
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
-dotenv.config();
 const mode = process.env.NODE_ENV || 'development';
-const isDevelopment = mode === 'development';
+// const isDevelopment = mode === 'development';
 
 const setUpViews = (app) => {
   const helpers = getHelpers(app);
@@ -59,12 +57,12 @@ const setUpStaticAssets = (app) => {
   });
 };
 
-const setupLocalization = () => {
-  i18next
+const setupLocalization = async () => {
+  await i18next
     .init({
       lng: 'ru',
       fallbackLng: 'en',
-      debug: isDevelopment,
+      // debug: isDevelopment,
       resources: {
         ru,
       },
@@ -78,12 +76,6 @@ const addHooks = (app) => {
     };
   });
 };
-
-const rollbar = new Rollbar({
-  accessToken: `${process.env.ROLLBAR_TOKEN}`,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
 
 const registerPlugins = (app) => {
   app.register(fastifySensible);
@@ -121,22 +113,15 @@ const registerPlugins = (app) => {
   });
 };
 
-export default (app) => {
+// eslint-disable-next-line no-unused-vars
+export default async (app, options) => {
   registerPlugins(app);
 
-  setupLocalization();
+  await setupLocalization();
   setUpViews(app);
   setUpStaticAssets(app);
   addRoutes(app);
   addHooks(app);
-
-  app.setErrorHandler((err, req, reply) => {
-    rollbar.errorHandler()(err, req, reply, (error) => {
-      rollbar.log(error);
-      reply.redirect('/');
-      return reply;
-    });
-  });
 
   return app;
 };

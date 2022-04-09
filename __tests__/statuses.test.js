@@ -1,7 +1,7 @@
 // @ts-check
 
 import fastify from 'fastify';
-import init from '../server/index.js';
+import init from '../server/plugin.js';
 import { getTestData, prepareData, signIn } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
@@ -15,7 +15,7 @@ describe('test statuses CRUD', () => {
   const testData = getTestData();
 
   beforeAll(async () => {
-    app = fastify({ logger: { prettyPrint: true } });
+    app = fastify({ logger: { prettyPrint: false } });
     await init(app);
 
     knex = app.objection.knex;

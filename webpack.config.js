@@ -1,3 +1,5 @@
+// @ts-check
+
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 const mode = process.env.NODE_ENV || 'development';

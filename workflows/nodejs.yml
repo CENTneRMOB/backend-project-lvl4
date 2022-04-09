@@ -1,0 +1,33 @@
+name: Node CI
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '17.x'
+      - name: install
+        run: make install
+      - name: prepare
+        run: make prepare
+      - name: Run linter
+        run: make lint
+      - name: Test & publish code coverage
+        # Publish code coverage on Code Climate
+        # https://github.com/paambaati/codeclimate-action
+        uses: paambaati/codeclimate-action@v2.6.0
+        # Add Code Climate secret key
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.TEST_ID_REP_4_CODE_CLIMATE}}
+        with:
+          coverageCommand: make test-coverage
+          debug: true
