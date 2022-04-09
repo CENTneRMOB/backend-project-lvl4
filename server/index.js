@@ -3,7 +3,6 @@
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
-import fastify from 'fastify';
 import fastifyStatic from 'fastify-static';
 import fastifyErrorPage from 'fastify-error-page';
 import pointOfView from 'point-of-view';
