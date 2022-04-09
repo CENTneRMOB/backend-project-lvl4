@@ -23,10 +23,24 @@
       "password": "O6AvLIQL1cbzrre"
     },
     "newWithError": {
-      "firstName": "Mary",
-      "lastName": "Spielberg", 
+      "firstName": "Third",
+      "lastName": "Fourth", 
       "email": "",
+      "password": "O6AvLIQL1cbzrre"
+    },
+    "newForUpdate": {
+      "firstName": "Mary1",
+      "lastName": "Spielberg2", 
+      "email": "Mary1_Spielberg2@live.com",
       "password": "RLJvaIgPOnX5r03"
+    },
+    "existingForSignIn": {
+      "email": "third.fourth122@gmail.com",
+      "password": "O6AvLIQL1cbzrre"
+    },
+    "userForCookies": {
+      "email": "COOKIESUSER101@gmail.com",
+      "password": "O6AvLIQL1cbzrre"
     }
   },
   "statuses": {

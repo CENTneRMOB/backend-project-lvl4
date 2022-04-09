@@ -22,5 +22,17 @@
     "lastName": "Kulas",
     "email": "lawrence.kulas95@outlook.com",
     "passwordDigest": "87c6374c24969f2af49433baa6d8b96e2bdb17a509b79049d2edb4fde98e4c46"
+  },
+  {
+    "firstName": "User",
+    "lastName": "FORCOOKIES",
+    "email": "COOKIESUSER101@gmail.com",
+    "passwordDigest": "87c6374c24969f2af49433baa6d8b96e2bdb17a509b79049d2edb4fde98e4c46"
+  },
+  {
+    "firstName": "Third",
+    "lastName": "Fourth",
+    "email": "third.fourth122@gmail.com",
+    "passwordDigest": "87c6374c24969f2af49433baa6d8b96e2bdb17a509b79049d2edb4fde98e4c46"
   }
 ]

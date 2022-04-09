@@ -40,6 +40,9 @@ export default (app) => {
       }
     })
     .patch('/users/:id', { name: 'updateUser', preValidation: app.authenticate }, async (req, reply) => {
+      // console.log('REQ PARAMS+body!!!: ', req.params, req.body);
+      // const users = await app.objection.models.user.query();
+      // console.log('USERS: ', users);
       const { id } = req.params;
       if (req.user.id !== Number(id)) {
         req.flash('error', i18next.t('flash.users.permissionDenied'));
@@ -56,6 +59,7 @@ export default (app) => {
         return reply;
       } catch (error) {
         req.flash('error', i18next.t('flash.users.edit.error'));
+        // console.log(error);
         reply.code(422).render('users/edit', { user, errors: error.data });
         return reply;
       }
