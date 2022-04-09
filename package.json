@@ -8,10 +8,10 @@
       "prebuild": "rm -rf dist",
       "test": "jest --verbose --runInBand",
       "build": "webpack",
-      "start": "NODE_ENV=production node server/bin/server.js"
+      "start": "fastify start server/index.js -l debug -P"
    },
    "engines": {
-      "node": "14.x"
+      "node": "17.x"
    },
    "jest": {
       "modulePathIgnorePatterns": [

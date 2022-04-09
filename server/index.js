@@ -122,13 +122,7 @@ const registerPlugins = (app) => {
   });
 };
 
-export default () => {
-  const app = fastify({
-    logger: {
-      prettyPrint: isDevelopment,
-    },
-  });
-
+export default (app) => {
   registerPlugins(app);
 
   setupLocalization();
