@@ -8,10 +8,7 @@ describe('test labels CRUD', () => {
   let app;
   let knex;
   let models;
-  let user;
   let cookies;
-  let labelParams;
-  let labelId;
   const testData = getTestData();
 
   beforeAll(async () => {
@@ -20,8 +17,6 @@ describe('test labels CRUD', () => {
 
     knex = app.objection.knex;
     models = app.objection.models;
-    user = testData.users.existing;
-    labelParams = testData.labels.existing;
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
@@ -31,9 +26,87 @@ describe('test labels CRUD', () => {
   });
 
   beforeEach(async () => {
-    cookies = await signIn(app, user);
-    const existingLabel = await models.label.query().findOne({ name: labelParams.name });
-    labelId = existingLabel.id;
+    cookies = await signIn(app, testData.users.existing);
+  });
+
+  describe('error cases', () => {
+    it.each([
+      ['labels', 'GET'],
+      ['newLabel', 'GET'],
+      ['createLabel', 'POST'],
+    ])('%s auth error case without params', async (route, method) => {
+      const response = await app.inject({
+        method,
+        url: app.reverse(route),
+      });
+
+      expect(response.statusCode).toBe(302);
+    });
+
+    it.each([
+      ['editLabel', 'GET'],
+      ['updateLabel', 'PATCH'],
+      ['deleteLabel', 'DELETE'],
+    ])('%s auth error case with param', async (route, method) => {
+      const { name } = testData.labels.existing;
+      const label = await models.label.query().findOne({ name });
+
+      const response = await app.inject({
+        method,
+        url: app.reverse(route, { id: label.id }),
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const actual = await models.label.query().findById(label.id);
+
+      expect(actual).toMatchObject(label);
+    });
+
+    it('create', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: app.reverse('createLabel'),
+        payload: {
+          data: {},
+        },
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(422);
+    });
+
+    it('update', async () => {
+      const params = testData.labels.existing;
+      const oldLabel = await models.label.query().findOne({ name: params.name });
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('updateLabel', { id: oldLabel.id }),
+        payload: {
+          data: { name: '' },
+        },
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(422);
+    });
+
+    it('delete label on task', async () => {
+      const { name } = testData.labels.labelFromTask;
+      const { id: labelId } = await models.label.query().findOne({ name });
+
+      const response = await app.inject({
+        method: 'DELETE',
+        url: app.reverse('deleteLabel', { id: labelId }),
+        cookies,
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const actual = await models.label.query().findById(labelId);
+
+      expect(actual).not.toBeUndefined();
+    });
   });
 
   describe('positive cases', () => {
@@ -110,101 +183,22 @@ describe('test labels CRUD', () => {
     });
 
     it('delete', async () => {
-      const params = testData.labels.deleting;
-      const existingLabel = await models.label.query().findOne({ name: params.name });
+      const { name } = testData.labels.deleting;
+      const { id: labelId } = await models.label.query().findOne({ name });
 
       const response = await app.inject({
         method: 'DELETE',
-        url: app.reverse('deleteLabel', { id: existingLabel.id }),
+        url: app.reverse('deleteLabel', { id: labelId }),
         cookies,
-      });
-
-      expect(response.statusCode).toBe(302);
-
-      const actual = await models.label.query().findById(existingLabel.id);
-
-      expect(actual).toBeUndefined();
-    });
-  });
-
-  describe('error cases', () => {
-    it.each([
-      ['labels', 'GET'],
-      ['newLabel', 'GET'],
-      ['createLabel', 'POST'],
-    ])('%s auth error case without params', async (route, method) => {
-      const response = await app.inject({
-        method,
-        url: app.reverse(route),
-      });
-
-      expect(response.statusCode).toBe(302);
-    });
-
-    it.each([
-      ['editLabel', 'GET'],
-      ['updateLabel', 'PATCH'],
-      ['deleteLabel', 'DELETE'],
-    ])('%s auth error case with param', async (route, method) => {
-      const response = await app.inject({
-        method,
-        url: app.reverse(route, { id: labelId }),
       });
 
       expect(response.statusCode).toBe(302);
 
       const actual = await models.label.query().findById(labelId);
 
-      expect(actual).toMatchObject(labelParams);
-    });
-
-    it('create', async () => {
-      const response = await app.inject({
-        method: 'POST',
-        url: app.reverse('createLabel'),
-        payload: {
-          data: {},
-        },
-        cookies,
-      });
-
-      expect(response.statusCode).toBe(422);
-    });
-
-    it('update', async () => {
-      const params = testData.labels.existing;
-      const oldLabel = await models.label.query().findOne({ name: params.name });
-      const response = await app.inject({
-        method: 'PATCH',
-        url: app.reverse('updateLabel', { id: oldLabel.id }),
-        payload: {
-          data: { name: '' },
-        },
-        cookies,
-      });
-
-      expect(response.statusCode).toBe(422);
-    });
-
-    it('delete label on task', async () => {
-      const params = testData.labels.labelFromTask;
-      const existingLabel = await models.label.query().findOne({ name: params.name });
-
-      const response = await app.inject({
-        method: 'DELETE',
-        url: app.reverse('deleteLabel', { id: existingLabel.id }),
-        cookies,
-      });
-
-      expect(response.statusCode).toBe(302);
-
-      const actual = await models.label.query().findById(existingLabel.id);
-
-      expect(actual).toMatchObject(params);
+      expect(actual).toBeUndefined();
     });
   });
 
-  afterAll(async () => {
-    app.close();
-  });
+  afterAll(() => app.close());
 });

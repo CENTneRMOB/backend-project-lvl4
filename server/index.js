@@ -1,7 +1,6 @@
 // @ts-check
 
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 import path from 'path';
 import fastifyStatic from 'fastify-static';
 import fastifyErrorPage from 'fastify-error-page';
@@ -10,7 +9,6 @@ import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
 import fastifyPassport from 'fastify-passport';
 import fastifySensible from 'fastify-sensible';
-// import fastifyFlash from 'fastify-flash';
 import { plugin as fastifyReverseRoutes } from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
 import fastifyObjectionjs from 'fastify-objectionjs';
@@ -28,7 +26,6 @@ import FormStrategy from './lib/passportStrategies/FormStrategy.js';
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
-dotenv.config();
 const mode = process.env.NODE_ENV || 'development';
 const isDevelopment = mode === 'development';
 

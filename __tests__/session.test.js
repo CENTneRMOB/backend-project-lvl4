@@ -7,7 +7,7 @@ import { getTestData, prepareData } from './helpers/index.js';
 describe('test session', () => {
   let app;
   let knex;
-  let testData;
+  const testData = getTestData();
 
   beforeAll(async () => {
     app = fastify({ logger: { prettyPrint: true } });
@@ -16,7 +16,6 @@ describe('test session', () => {
     knex = app.objection.knex;
     await knex.migrate.latest();
     await prepareData(app);
-    testData = getTestData();
   });
 
   it('test sign in / sign out', async () => {
@@ -53,7 +52,5 @@ describe('test session', () => {
     expect(responseSignOut.statusCode).toBe(302);
   });
 
-  afterAll(async () => {
-    app.close();
-  });
+  afterAll(() => app.close());
 });

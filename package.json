@@ -16,7 +16,11 @@
    "jest": {
       "modulePathIgnorePatterns": [
          "<rootDir>/__tests__/helpers/"
-      ]
+      ],
+      "setupFiles": [
+         "dotenv/config"
+      ],
+      "testRunner": "jest-circus/runner"
    },
    "author": "Boris P.",
    "license": "ISC",
@@ -68,6 +72,7 @@
       "eslint-plugin-import": "^2.25.4",
       "eslint-plugin-jest": "^26.1.3",
       "jest": "^27.5.1",
+      "jest-circus": "^27.5.1",
       "jest-cli": "^27.5.1",
       "pino-pretty": "^7.6.0",
       "style-loader": "^3.3.1",

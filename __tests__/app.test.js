@@ -30,7 +30,5 @@ describe('requests', () => {
     expect(res.statusCode).toBe(404);
   });
 
-  afterAll(() => {
-    app.close();
-  });
+  afterAll(() => app.close());
 });
