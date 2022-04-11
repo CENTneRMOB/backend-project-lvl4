@@ -18,11 +18,25 @@ export default (app) => {
         isCreatorUser,
       } = params;
 
-      const tasks = await app.objection.models.task.query()
-        .modify('byStatus', status)
-        .modify('byExecutor', executor)
-        .modify('byCreator', isCreatorUser, req.user.id)
-        .modify('byLabel', label, app.objection);
+      const taskQuery = app.objection.models.task.query();
+
+      if (status) {
+        taskQuery.modify('byStatus', status);
+      }
+
+      if (executor) {
+        taskQuery.modify('byExecutor', executor);
+      }
+
+      if (isCreatorUser) {
+        taskQuery.modify('byCreator', isCreatorUser, req.user.id);
+      }
+
+      if (label) {
+        taskQuery.modify('byLabel', label, app.objection);
+      }
+
+      const tasks = await taskQuery;
 
       reply.render('tasks/index', {
         tasks, statuses, users, labels, params,
