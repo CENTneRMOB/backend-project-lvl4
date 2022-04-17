@@ -8,7 +8,6 @@ export default (app) => {
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
       const labels = await app.objection.models.label.query();
-      // const tasks = await app.objection.models.task.query().withGraphJoined('[creator, executor, status, labels]');
 
       const params = req.query;
 
