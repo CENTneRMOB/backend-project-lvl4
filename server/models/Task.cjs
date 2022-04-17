@@ -11,19 +11,19 @@ module.exports = class Task extends BaseModel {
   static get modifiers() {
     return {
       byStatus(query, statusId) {
-        query.where('statusId', Number(statusId));
+        query.where('statusId', statusId);
       },
 
       byExecutor(query, executorId) {
-        query.where('executorId', Number(executorId));
+        query.where('executorId', executorId);
       },
 
-      byCreator(query, isCreator, creatorId) {
-        query.where('creatorId', Number(creatorId));
+      byCreator(query, creatorId) {
+        query.where('creatorId', creatorId);
       },
 
-      byLabel(query, labelId, objection) {
-        query.whereExists(objection.knex('tasks_labels').whereRaw('label_id = ?', labelId).whereRaw('tasks_labels.task_id = tasks.id'));
+      byLabel(query, labelId) {
+        query.where('labels.id', labelId);
       },
     };
   }

@@ -28,18 +28,18 @@ describe('test users CRUD', () => {
 
   describe('error casses', () => {
     it('create', async () => {
-      const params = testData.users.newWithError;
+      const data = testData.users.newWithError;
       const response = await app.inject({
         method: 'POST',
         url: app.reverse('users'),
         payload: {
-          data: params,
+          data,
         },
       });
 
       expect(response.statusCode).toBe(422);
 
-      const expected = await models.user.query().findById({ email: params.email });
+      const expected = await models.user.query().findById({ email: data.email });
 
       expect(expected).toBeUndefined();
     });
@@ -60,15 +60,15 @@ describe('test users CRUD', () => {
     });
 
     it('update with user error', async () => {
-      const newParams = testData.users.newWithError;
-      const params = testData.users.updating;
-      const cookies = await signIn(app, params);
-      const oldUser = await models.user.query().findOne({ email: params.email });
+      const data = testData.users.newWithError;
+      const user = testData.users.updating;
+      const cookies = await signIn(app, user);
+      const { id } = await models.user.query().findOne({ email: user.email });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('updateUser', { id: oldUser.id }),
+        url: app.reverse('updateUser', { id }),
         payload: {
-          data: newParams,
+          data,
         },
         cookies,
       });
@@ -133,31 +133,31 @@ describe('test users CRUD', () => {
     });
 
     it('create', async () => {
-      const params = testData.users.new;
+      const data = testData.users.new;
       const response = await app.inject({
         method: 'POST',
         url: app.reverse('users'),
         payload: {
-          data: params,
+          data,
         },
       });
 
       expect(response.statusCode).toBe(302);
       const expected = {
-        ..._.omit(params, 'password'),
-        passwordDigest: encrypt(params.password),
+        ..._.omit(data, 'password'),
+        passwordDigest: encrypt(data.password),
       };
-      const user = await models.user.query().findOne({ email: params.email });
+      const user = await models.user.query().findOne({ email: data.email });
       expect(user).toMatchObject(expected);
     });
 
     it('edit', async () => {
-      const params = testData.users.updating;
-      const cookies = await signIn(app, params);
-      const user = await models.user.query().findOne({ email: params.email });
+      const user = testData.users.updating;
+      const cookies = await signIn(app, user);
+      const { id } = await models.user.query().findOne({ email: user.email });
       const response = await app.inject({
         method: 'GET',
-        url: app.reverse('editUser', { id: user.id }),
+        url: app.reverse('editUser', { id }),
         cookies,
       });
 
@@ -165,25 +165,25 @@ describe('test users CRUD', () => {
     });
 
     it('update', async () => {
-      const params = testData.users.existing;
-      const newParams = testData.users.updating;
-      const cookies = await signIn(app, params);
-      const oldUser = await models.user.query().findOne({ email: params.email });
+      const user = testData.users.existing;
+      const data = testData.users.updating;
+      const cookies = await signIn(app, user);
+      const { id } = await models.user.query().findOne({ email: user.email });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('updateUser', { id: oldUser.id }),
+        url: app.reverse('updateUser', { id }),
         payload: {
-          data: newParams,
+          data,
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const newUser = await models.user.query().findById(oldUser.id);
+      const newUser = await models.user.query().findById(id);
       const expected = {
-        ..._.omit(newParams, 'password'),
-        passwordDigest: encrypt(newParams.password),
+        ..._.omit(data, 'password'),
+        passwordDigest: encrypt(data.password),
       };
 
       expect(newUser).toMatchObject(expected);

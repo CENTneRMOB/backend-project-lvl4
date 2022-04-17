@@ -45,6 +45,14 @@ module.exports = class User extends unique(BaseModel) {
     };
   }
 
+  static get virtualAttributes() {
+    return ['fullName'];
+  }
+
+  fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
   set password(value) {
     this.passwordDigest = encrypt(value);
   }

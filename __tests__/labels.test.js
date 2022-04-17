@@ -77,11 +77,11 @@ describe('test labels CRUD', () => {
     });
 
     it('update', async () => {
-      const params = testData.labels.existing;
-      const oldLabel = await models.label.query().findOne({ name: params.name });
+      const { name } = testData.labels.existing;
+      const { id } = await models.label.query().findOne({ name });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('updateLabel', { id: oldLabel.id }),
+        url: app.reverse('updateLabel', { id }),
         payload: {
           data: { name: '' },
         },
@@ -130,32 +130,29 @@ describe('test labels CRUD', () => {
     });
 
     it('create', async () => {
-      const newLabel = testData.labels.new;
+      const data = testData.labels.new;
       const response = await app.inject({
         method: 'POST',
         url: app.reverse('createLabel'),
         payload: {
-          data: newLabel,
+          data,
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const label = await models.label.query().findOne({ name: newLabel.name });
+      const label = await models.label.query().findOne({ name: data.name });
 
-      expect(label).toMatchObject(newLabel);
+      expect(label).toMatchObject(data);
     });
 
     it('edit', async () => {
-      const params = testData.labels.existing;
-      const label = await models.label.query().findOne({ name: params.name });
+      const { name } = testData.labels.existing;
+      const { id } = await models.label.query().findOne({ name });
       const response = await app.inject({
         method: 'GET',
-        url: app.reverse('editLabel', { id: label.id }),
-        payload: {
-          data: params,
-        },
+        url: app.reverse('editLabel', { id }),
         cookies,
       });
 
@@ -163,23 +160,23 @@ describe('test labels CRUD', () => {
     });
 
     it('update', async () => {
-      const newParams = testData.labels.updating;
-      const params = testData.labels.existing;
-      const oldLabel = await models.label.query().findOne({ name: params.name });
+      const data = testData.labels.updating;
+      const { name } = testData.labels.existing;
+      const { id } = await models.label.query().findOne({ name });
       const response = await app.inject({
         method: 'PATCH',
-        url: app.reverse('updateLabel', { id: oldLabel.id }),
+        url: app.reverse('updateLabel', { id }),
         payload: {
-          data: newParams,
+          data,
         },
         cookies,
       });
 
       expect(response.statusCode).toBe(302);
 
-      const actual = await models.label.query().findById(oldLabel.id);
+      const actual = await models.label.query().findById(id);
 
-      expect(actual).toMatchObject(newParams);
+      expect(actual).toMatchObject(data);
     });
 
     it('delete', async () => {

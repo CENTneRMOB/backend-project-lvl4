@@ -29,12 +29,9 @@ block content
           td= task.id
           td
             a(href=`/tasks/${task.id}`)= task.name
-          td= _.find(statuses, { id: task.statusId }).name
-
-          - const getFullName = (user) => `${user.firstName} ${user.lastName}`;
-
-          td= getFullName(_.find(users, { id: task.creatorId }))
-          td= !task.executorId ? '' : getFullName(_.find(users, { id: task.executorId }))
+          td= task.status.name
+          td= task.creator.fullName()
+          td= !task.executorId ? '' : task.executor.fullName()
           td= formatDate(task.createdAt)
           td
             a(href=`/tasks/${task.id}/edit`)= t('views.tasks.edit.submit')

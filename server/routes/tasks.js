@@ -8,6 +8,7 @@ export default (app) => {
       const statuses = await app.objection.models.status.query();
       const users = await app.objection.models.user.query();
       const labels = await app.objection.models.label.query();
+      // const tasks = await app.objection.models.task.query().withGraphJoined('[creator, executor, status, labels]');
 
       const params = req.query;
 
@@ -18,7 +19,7 @@ export default (app) => {
         isCreatorUser,
       } = params;
 
-      const taskQuery = app.objection.models.task.query();
+      const taskQuery = app.objection.models.task.query().withGraphJoined('[creator, executor, status, labels]');
 
       if (status) {
         taskQuery.modify('byStatus', status);
@@ -29,11 +30,11 @@ export default (app) => {
       }
 
       if (isCreatorUser) {
-        taskQuery.modify('byCreator', isCreatorUser, req.user.id);
+        taskQuery.modify('byCreator', req.user.id);
       }
 
       if (label) {
-        taskQuery.modify('byLabel', label, app.objection);
+        taskQuery.modify('byLabel', label);
       }
 
       const tasks = await taskQuery;
